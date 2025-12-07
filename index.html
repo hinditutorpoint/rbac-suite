@@ -693,7 +693,8 @@
                                 <i class="bi bi-info-circle me-2"></i>
                                 <strong>Free Edition:</strong> You're using the free edition which includes all
                                 essential RBAC features.
-                                <a href="#comparison" class="alert-link">See what's available in PRO →</a>
+                                <a href="#comparison" @click.prevent="activeTab = 'comparison'" class="alert-link">See
+                                    what's available in PRO →</a>
                             </div>
 
                             <h4 class="mt-4 mb-3">Key Features</h4>
@@ -5801,7 +5802,7 @@ php artisan omni-access:clear-cache --role=1</code></pre>
                                         </div>
                                     </div>
 
-                                    <a href="https://github.com/sponsors/your-username" target="_blank"
+                                    <a href="https://github.com/sponsors/hinditutorpoint" target="_blank"
                                         class="btn btn-warning btn-lg">
                                         <i class="bi bi-github me-2"></i>
                                         Become a GitHub Sponsor

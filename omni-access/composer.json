@@ -1,5 +1,5 @@
 {
-    "name": "rbacsuite/omni-access",
+    "name": "rbac-suite/omni-access",
     "description": "Laravel Advance Permission Manager (FREE) - RBAC with basic roles & permissions.",
     "type": "library",
     "version": "1.0.0",
