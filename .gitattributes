@@ -1,0 +1,12 @@
+/images/omni-access-free-twitter.png export-ignore
+/index.html export-ignore
+/vendor/ export-ignore
+/composer.lock export-ignore
+/.phpunit.result.cache export-ignore
+/.DS_Store export-ignore
+/Thumbs.db export-ignore
+
+# Extra recommended ignores
+/tests/ export-ignore
+/docs/ export-ignore
+/.github/ export-ignore
