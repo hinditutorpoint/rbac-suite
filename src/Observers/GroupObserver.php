@@ -4,6 +4,7 @@ namespace RbacSuite\OmniAccess\Observers;
 
 use RbacSuite\OmniAccess\Models\Group;
 use RbacSuite\OmniAccess\Services\CacheService;
+use Illuminate\Support\Str;
 
 class GroupObserver
 {
@@ -12,6 +13,21 @@ class GroupObserver
     public function __construct(CacheService $cache)
     {
         $this->cache = $cache;
+    }
+
+    public function creating(Group $group): void
+    {
+        if (empty($group->slug)) {
+            $group->slug = $this->generateUniqueSlug($group->name);
+        }
+    }
+
+    // Do NOT modify slug on update
+    public function updating(Group $group): void
+    {
+        if ($group->isDirty('slug')) {
+            $group->slug = $group->getOriginal('slug');
+        }
     }
 
     public function created(Group $group): void
@@ -33,5 +49,19 @@ class GroupObserver
     {
         $this->cache->forgotGroup($group->id);
         $this->cache->forgetPermissions();
+    }
+
+    protected function generateUniqueSlug(string $name): string
+    {
+        $slug = Str::slug($name);
+        $original = $slug;
+        $counter = 2;
+
+        while (Group::where('slug', $slug)->exists()) {
+            $slug = "{$original}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
     }
 }

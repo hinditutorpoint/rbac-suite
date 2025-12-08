@@ -219,4 +219,9 @@ trait HasRoles
         $this->forgetPermissionCache();
         $this->getAllPermissions();
     }
+
+    public function getDefaultGuardName(): string
+    {
+        return property_exists($this, 'guard') ? $this->guard : 'web';
+    }
 }

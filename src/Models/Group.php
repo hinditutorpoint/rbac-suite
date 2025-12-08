@@ -13,6 +13,7 @@ class Group extends Model
     protected $fillable = [
         'name',
         'slug',
+        'guard_name',
         'description',
         'sort_order',
     ];
@@ -30,6 +31,7 @@ class Group extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::observe(\RbacSuite\OmniAccess\Observers\GroupObserver::class);
     }
 

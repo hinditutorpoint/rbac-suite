@@ -25,6 +25,7 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('slug')->unique();
                 $table->text('description')->nullable();
+                $table->string('guard_name')->default('web');
                 $table->boolean('is_default')->default(false);
                 $table->timestamps();
                 $table->softDeletes();
