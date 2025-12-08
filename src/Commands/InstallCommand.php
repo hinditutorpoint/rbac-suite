@@ -27,6 +27,13 @@ class InstallCommand extends Command
         ]);
         $this->info('✅ Config published');
 
+        // Publish migrations
+        Artisan::call('vendor:publish', [
+            '--provider' => 'RbacSuite\OmniAccess\OmniAccessServiceProvider',
+            '--tag' => 'omni-access-migrations'
+        ]);
+        $this->info('✅ Migrations published');
+
         // Run migrations
         $this->info('Running migrations...');
         Artisan::call('migrate');
@@ -37,15 +44,16 @@ class InstallCommand extends Command
             $this->seedDefaultData();
         }
 
-        // Assign super-admin to first user
+        // Assign super admin
         if (config('omni-access.auto_assign_super_admin')) {
             $this->assignSuperAdmin();
         }
 
         $this->info('✨ OMNI Access installed successfully!');
-        
+
         return self::SUCCESS;
     }
+
 
     protected function seedDefaultData(): void
     {

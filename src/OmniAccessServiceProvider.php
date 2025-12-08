@@ -40,8 +40,6 @@ class OmniAccessServiceProvider extends ServiceProvider
                 InstallCommand::class,
                 ClearCacheCommand::class,
             ]);
-
-            $this->publishMigrations();
         }
 
         $this->registerMiddleware();
@@ -55,18 +53,6 @@ class OmniAccessServiceProvider extends ServiceProvider
         $router->aliasMiddleware('role', RoleMiddleware::class);
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
         $router->aliasMiddleware('role_or_permission', RoleOrPermissionMiddleware::class);
-    }
-
-    /**
-     * Publish migrations.
-     */
-    protected function publishMigrations(): void
-    {
-        $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'permission-migrations');
-
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     protected function registerBladeDirectives(): void
