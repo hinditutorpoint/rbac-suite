@@ -28,9 +28,9 @@ trait HasRoles
     {
         return $this->belongsToMany(
             Role::class,
-            config('omni-access-manager.table_names.role_user'),
-            config('omni-access-manager.column_names.user_pivot_key'),
-            config('omni-access-manager.column_names.role_pivot_key')
+            config('omni-access.table_names.role_user'),
+            config('omni-access.column_names.user_pivot_key'),
+            config('omni-access.column_names.role_pivot_key')
         )->withTimestamps();
     }
 
@@ -106,7 +106,7 @@ trait HasRoles
 
     public function hasPermission($permission): bool
     {
-        if ($this->hasRole(config('omni-access-manager.super_admin_role'))) {
+        if ($this->hasRole(config('omni-access.super_admin_role'))) {
             return true;
         }
 
@@ -115,7 +115,7 @@ trait HasRoles
 
     public function hasAnyPermission(...$permissions): bool
     {
-        if ($this->hasRole(config('omni-access-manager.super_admin_role'))) {
+        if ($this->hasRole(config('omni-access.super_admin_role'))) {
             return true;
         }
 
@@ -130,7 +130,7 @@ trait HasRoles
 
     public function hasAllPermissions(...$permissions): bool
     {
-        if ($this->hasRole(config('omni-access-manager.super_admin_role'))) {
+        if ($this->hasRole(config('omni-access.super_admin_role'))) {
             return true;
         }
 
@@ -145,7 +145,7 @@ trait HasRoles
 
     public function getAllPermissions(): Collection
     {
-        if ($this->hasRole(config('omni-access-manager.super_admin_role'))) {
+        if ($this->hasRole(config('omni-access.super_admin_role'))) {
             return Permission::getAllCached();
         }
 
@@ -198,7 +198,7 @@ trait HasRoles
 
     public function isSuperAdmin(): bool
     {
-        return $this->hasRole(config('omni-access-manager.super_admin_role'));
+        return $this->hasRole(config('omni-access.super_admin_role'));
     }
 
     /**

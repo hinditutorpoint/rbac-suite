@@ -57,6 +57,12 @@ class CacheService
             $store->connection()->del($store->connection()->keys($pattern));
         }
     }
+    
+    // Group cache methods
+    public function forgotGroup(int|string $groupId): void
+    {
+        $this->forget("user.{$groupId}.groups");
+    }
 
     // User cache methods
     public function forgetUser(int|string $userId): void
@@ -74,6 +80,16 @@ class CacheService
 
     // Permission cache methods
     public function forgetPermission(int|string $permissionId): void
+    {
+        $this->forget("permission.{$permissionId}");
+    }
+
+    public function forgetPermissions(): void
+    {
+        $this->forgetPattern('permission.*');
+    }
+
+    public function forgetUserPermissions(int|string $permissionId): void
     {
         $this->forget("permission.{$permissionId}");
     }
