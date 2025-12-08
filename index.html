@@ -4,7 +4,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OMNI Access - Free RBAC Documentation</title>
+    <title>OMNI Access FREE - Laravel RBAC Package Documentation | Role-Based Access Control</title>
+    <meta name="title" content="OMNI Access FREE - Laravel RBAC Package Documentation | Role-Based Access Control">
+    <meta name="description"
+        content="Complete Laravel RBAC package with roles, permissions, and groups. Free open-source role-based access control system for Laravel 10, 11, 12. Easy installation, blade directives, middleware support, and comprehensive API documentation.">
+    <meta name="keywords"
+        content="Laravel RBAC, Laravel permissions, Laravel roles, role-based access control, Laravel ACL, Laravel authorization, permission management, Laravel package, free RBAC, Laravel 10, Laravel 11, Laravel 12, PHP 8.2, PHP 8.3, open source RBAC">
+    <meta name="author" content="RbacSuite">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <link rel="canonical" href="https://hinditutorpoint.github.io/rbac-suite">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hinditutorpoint.github.io/rbac-suite">
+    <meta property="og:title" content="OMNI Access FREE - Laravel RBAC Package Documentation">
+    <meta property="og:description"
+        content="Complete Laravel RBAC package with roles, permissions, and groups. Free open-source role-based access control system for Laravel 10, 11, 12. Easy installation, comprehensive API documentation.">
+    <meta property="og:image" content="https://hinditutorpoint.github.io/rbac-suite/images/omni-access-free-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="OMNI Access Documentation">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://hinditutorpoint.github.io/rbac-suite">
+    <meta name="twitter:title" content="OMNI Access FREE - Laravel RBAC Package Documentation">
+    <meta name="twitter:description"
+        content="Complete Laravel RBAC package with roles, permissions, and groups. Free open-source role-based access control system for Laravel 10, 11, 12.">
+    <meta name="twitter:image"
+        content="https://hinditutorpoint.github.io/rbac-suite/images/omni-access-free-twitter.png">
+    <meta name="twitter:creator" content="@yourusername">
+
+    <!-- Additional SEO Tags -->
+    <meta name="application-name" content="OMNI Access">
+    <meta name="apple-mobile-web-app-title" content="OMNI Access Docs">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="msapplication-TileColor" content="#2563eb">
+
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="US">
+    <meta name="geo.placename" content="United States">
+
+    <!-- Article Tags for Documentation -->
+    <meta property="article:published_time" content="2025-08-15T08:00:00+00:00">
+    <meta property="article:modified_time" content="2025-08-15T08:00:00+00:00">
+    <meta property="article:author" content="RbacSuite Team">
+    <meta property="article:section" content="Documentation">
+    <meta property="article:tag" content="Laravel, RBAC, Permissions, Roles, PHP, Open Source">
+
+    <!-- Structured Data - JSON-LD for AI Understanding -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "SoftwareApplication",
+                "name": "OMNI Access FREE",
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "Cross-platform",
+                "description": "Complete Role-Based Access Control (RBAC) package for Laravel applications. Manage roles, permissions, and user access with ease.",
+                "softwareVersion": "1.0.0",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
+                },
+                "programmingLanguage": "PHP",
+                "keywords": "Laravel, RBAC, Permissions, Roles, Access Control, Authorization",
+                "author": {
+                    "@type": "Organization",
+                    "name": "RbacSuite",
+                    "url": "https://hinditutorpoint.github.io/rbac-suite"
+                },
+                "softwareRequirements": "PHP 8.2+, Laravel 10+",
+                "releaseNotes": "Initial release with core RBAC features",
+                "featureList": [
+                    "Role Management",
+                    "Permission Management",
+                    "Permission Groups",
+                    "Blade Directives",
+                    "Middleware Support",
+                    "Basic Caching",
+                    "Bootstrap 5 UI",
+                    "Complete CRUD Examples"
+                ]
+            },
+            {
+                "@type": "TechArticle",
+                "headline": "OMNI Access FREE - Complete Laravel RBAC Documentation",
+                "description": "Comprehensive developer documentation for OMNI Access FREE edition. Learn how to implement role-based access control in Laravel applications.",
+                "author": {
+                    "@type": "Organization",
+                    "name": "RbacSuite"
+                },
+                "datePublished": "2025-08-12",
+                "dateModified": "2025-08-12",
+                "programmingLanguage": "PHP",
+                "proficiencyLevel": "Beginner to Advanced",
+                "articleSection": "Documentation",
+                "keywords": "Laravel RBAC tutorial, Laravel permissions guide, role-based access control",
+                "dependencies": "Laravel 10+, PHP 8.2+, Composer"
+            },
+            {
+                "@type": "HowTo",
+                "name": "How to Install and Use OMNI Access FREE",
+                "description": "Step-by-step guide to install and configure OMNI Access RBAC package in Laravel",
+                "step": [
+                    {
+                        "@type": "HowToStep",
+                        "name": "Install Package",
+                        "text": "Install via Composer: composer require rbac-suite/omni-access"
+                    },
+                    {
+                        "@type": "HowToStep",
+                        "name": "Run Installation",
+                        "text": "Execute: php artisan omni-access:install --seed"
+                    },
+                    {
+                        "@type": "HowToStep",
+                        "name": "Add Traits to User Model",
+                        "text": "Add HasRoles and HasPermissions traits to your User model"
+                    },
+                    {
+                        "@type": "HowToStep",
+                        "name": "Start Using",
+                        "text": "Begin assigning roles and permissions to users"
+                    }
+                ]
+            },
+            {
+                "@type": "WebPage",
+                "name": "OMNI Access FREE Documentation",
+                "url": "https://hinditutorpoint.github.io/rbac-suite",
+                "description": "Official documentation for OMNI Access FREE - Laravel RBAC Package",
+                "inLanguage": "en-US",
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "OMNI Access Documentation",
+                    "url": "https://hinditutorpoint.github.io/rbac-suite"
+                },
+                "breadcrumb": {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Home",
+                            "item": "https://hinditutorpoint.github.io/rbac-suite"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": "Documentation",
+                            "item": "https://hinditutorpoint.github.io/rbac-suite/docs"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 3,
+                            "name": "OMNI Access FREE",
+                            "item": "https://hinditutorpoint.github.io/rbac-suite"
+                        }
+                    ]
+                }
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "What is OMNI Access FREE?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "OMNI Access FREE is an open-source Role-Based Access Control (RBAC) package for Laravel applications that provides comprehensive role and permission management."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Which Laravel versions are supported?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "OMNI Access FREE supports Laravel 10.x, 11.x, and 12.x with PHP 8.2, 8.3, and 8.4."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Is OMNI Access FREE really free?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes, OMNI Access FREE is completely free and open-source under MIT license. PRO features are available through GitHub Sponsors."
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <!-- Additional AI/Bot Meta Tags -->
+    <meta name="fragment" content="!">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
+
+    <!-- Performance Hints -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <!-- Favicon for Branding -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -5815,6 +6030,12 @@ php artisan omni-access:clear-cache --role=1</code></pre>
             </div>
         </div>
     </div>
+
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 Hinditutorpoint. All rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" onclick="scrollToTop()" x-show="showBackToTop" x-cloak>
