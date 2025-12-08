@@ -7,18 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RbacSuite\OmniAccess\Services\CacheService;
 use RbacSuite\OmniAccess\Traits\HasPrimaryKeyType;
-use RbacSuite\OmniAccess\Traits\MultiTenantAware;
 
 class Role extends Model
 {
-    use HasPrimaryKeyType, MultiTenantAware, SoftDeletes;
+    use HasPrimaryKeyType, SoftDeletes;
 
     protected $fillable = [
         'name',
         'slug',
         'description',
         'is_default',
-        'tenant_id',
     ];
 
     protected $casts = [
@@ -28,34 +26,32 @@ class Role extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->setTable(config('omni-access-manager.table_names.roles', 'roles'));
+        $this->setTable(config('omni-access.table_names.roles', 'roles'));
     }
 
     protected static function boot()
     {
         parent::boot();
-
-        // Register observer
-        static::observe(\StoreLock\AdvancePermission\Observers\RoleObserver::class);
+        static::observe(\RbacSuite\OmniAccess\Observers\RoleObserver::class);
     }
 
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(
             Permission::class,
-            config('omni-access-manager.table_names.permission_role'),
-            config('omni-access-manager.column_names.role_pivot_key'),
-            config('omni-access-manager.column_names.permission_pivot_key')
+            config('omni-access.table_names.permission_role'),
+            config('omni-access.column_names.role_pivot_key'),
+            config('omni-access.column_names.permission_pivot_key')
         )->withTimestamps();
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('omni-access-manager.user_model'),
-            config('omni-access-manager.table_names.role_user'),
-            config('omni-access-manager.column_names.role_pivot_key'),
-            config('omni-access-manager.column_names.user_pivot_key')
+            config('omni-access.user_model'),
+            config('omni-access.table_names.role_user'),
+            config('omni-access.column_names.role_pivot_key'),
+            config('omni-access.column_names.user_pivot_key')
         )->withTimestamps();
     }
 
@@ -67,8 +63,8 @@ class Role extends Model
     public function getCachedPermissions()
     {
         $cache = app(CacheService::class);
-
-        return $cache->cacheRolePermissions($this->id, function () {
+        
+        return $cache->remember("role.{$this->id}.permissions", function () {
             return $this->permissions()->get();
         });
     }
@@ -76,37 +72,32 @@ class Role extends Model
     public function givePermissionTo(...$permissions): self
     {
         $permissions = $this->getPermissions($permissions);
-
+        
         if ($permissions->isEmpty()) {
             return $this;
         }
-
+        
         $this->permissions()->syncWithoutDetaching($permissions);
-
         $this->forgetCachedPermissions();
-
+        
         return $this;
     }
 
     public function revokePermissionTo(...$permissions): self
     {
         $permissions = $this->getPermissions($permissions);
-
         $this->permissions()->detach($permissions);
-
         $this->forgetCachedPermissions();
-
+        
         return $this;
     }
 
     public function syncPermissions(...$permissions): self
     {
         $permissions = $this->getPermissions($permissions);
-
         $this->permissions()->sync($permissions);
-
         $this->forgetCachedPermissions();
-
+        
         return $this;
     }
 
@@ -118,7 +109,7 @@ class Role extends Model
                 if ($permission instanceof Permission) {
                     return $permission;
                 }
-
+                
                 return Permission::where('slug', $permission)->first();
             })
             ->filter()
@@ -129,46 +120,33 @@ class Role extends Model
     {
         $cache = app(CacheService::class);
         $cache->forgetRole($this->id);
-
+        
         // Clear cache for all users with this role
         foreach ($this->users()->pluck('id') as $userId) {
-            $cache->forgetUserPermissions($userId);
+            $cache->forgetUser($userId);
         }
     }
 
-    /**
-     * Get all roles with caching
-     */
     public static function getAllCached()
     {
         $cache = app(CacheService::class);
-
-        return $cache->cacheRoles(function () {
+        
+        return $cache->remember('roles.all', function () {
             return static::all();
         });
     }
 
-    /**
-     * Get all roles with permissions (cached)
-     */
-    public static function getAllWithPermissions()
-    {
-        $cache = app(CacheService::class);
-
-        return $cache->cacheRolesWithPermissions(function () {
-            return static::with('permissions')->get();
-        });
-    }
-
-    /**
-     * Find role by slug with caching
-     */
     public static function findBySlugCached(string $slug): ?self
     {
         $cache = app(CacheService::class);
-
+        
         return $cache->remember("role.slug.{$slug}", function () use ($slug) {
             return static::where('slug', $slug)->first();
         });
+    }
+
+    public static function getDefaultRole(): ?self
+    {
+        return static::where('is_default', true)->first();
     }
 }
