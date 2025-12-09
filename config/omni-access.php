@@ -43,6 +43,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Slug Settings
+    |--------------------------------------------------------------------------
+    */
+    'slug' => [
+        'immutable' => true, // Prevent slug changes after creation
+        'auto_generate' => true, // Auto-generate slug from name
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | User Model
     |--------------------------------------------------------------------------
     */
@@ -59,6 +69,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Guards
+    |--------------------------------------------------------------------------
+    */
+    'guards' => [
+        'default' => null, // null = use Laravel's default guard
+        'available' => ['web', 'api', 'admin'], // Available guards for roles/permissions
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Cache Configuration (Basic)
     |--------------------------------------------------------------------------
     */
@@ -66,6 +86,90 @@ return [
         'enabled' => env('OMNI_ACCESS_CACHE_ENABLED', true),
         'expiration_time' => env('OMNI_ACCESS_CACHE_TTL', 60 * 24), // 24 hours
         'key_prefix' => env('OMNI_ACCESS_CACHE_PREFIX', 'omni_access'),
+        'store' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware Settings
+    |--------------------------------------------------------------------------
+    */
+    'middleware' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Register Middleware Aliases
+        |--------------------------------------------------------------------------
+        */
+        'register' => true,
+        'aliases' => [
+            'role' => \RbacSuite\OmniAccess\Middleware\RoleMiddleware::class,
+            'permission' => \RbacSuite\OmniAccess\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \RbacSuite\OmniAccess\Middleware\RoleOrPermissionMiddleware::class,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Unauthorized Response Configuration
+        |--------------------------------------------------------------------------
+        | 
+        | response_type: 'json', 'view', 'redirect', 'abort'
+        | 
+        | For 'view': renders the specified view
+        | For 'redirect': redirects to specified URL with flash message
+        | For 'json': returns JSON response
+        | For 'abort': aborts with status code
+        |
+        */
+        'unauthorized' => [
+            // Response type: json, view, redirect, abort
+            'response_type' => 'auto', // 'auto' = json for API, abort for web
+            
+            // HTTP status codes
+            'status_code' => [
+                'unauthenticated' => 401,
+                'forbidden' => 403,
+                'invalid_guard' => 403,
+                'missing_trait' => 500,
+            ],
+
+            // Messages (supports string or array with guard-specific messages)
+            'messages' => [
+                'unauthenticated' => 'You must be logged in to access this resource.',
+                'forbidden_role' => 'You do not have the required role to access this resource.',
+                'forbidden_permission' => 'You do not have the required permission to access this resource.',
+                'invalid_guard' => 'Invalid authentication guard specified.',
+                'missing_trait' => 'User model must use HasRoles trait.',
+            ],
+
+            // View configuration (when response_type is 'view')
+            'view' => [
+                'name' => 'errors.unauthorized', // View name
+                'layout' => null, // Optional layout
+                'data' => [], // Additional data to pass to view
+            ],
+
+            // Redirect configuration (when response_type is 'redirect')
+            'redirect' => [
+                'url' => '/login',
+                'route' => null, // Use route name instead of URL
+                'with_message' => true, // Flash message to session
+                'message_key' => 'error', // Session key for message
+            ],
+
+            // JSON configuration (when response_type is 'json')
+            'json' => [
+                'include_required' => false, // Include required roles/permissions in response
+                'include_user_roles' => false, // Include user's current roles
+            ],
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Guard Validation
+        |--------------------------------------------------------------------------
+        */
+        'validate_guard' => true, // Validate if guard exists in available guards
+        'strict_guard' => false, // If true, guard must match exactly
     ],
 
     /*

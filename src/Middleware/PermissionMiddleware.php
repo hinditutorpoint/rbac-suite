@@ -4,33 +4,60 @@ namespace RbacSuite\OmniAccess\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use RbacSuite\OmniAccess\Traits\HandlesAuthorization;
+use RbacSuite\OmniAccess\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {
-    public function handle(Request $request, Closure $next, ...$permissions)
+    use HandlesAuthorization;
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  mixed  ...$params  Permissions (string, comma-separated, pipe-separated) and optional guard
+     * @return mixed
+     *
+     * @throws \RbacSuite\OmniAccess\Exceptions\UnauthorizedException
+     * 
+     * Usage:
+     * - Route::middleware('permission:create-posts')
+     * - Route::middleware('permission:create-posts,edit-posts')
+     * - Route::middleware('permission:create-posts|edit-posts')
+     * - Route::middleware('permission:create-posts,guard:api')
+     */
+    public function handle(Request $request, Closure $next, ...$params)
     {
-        if (!Auth::check()) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Unauthorized access'], 401);
-            }
-            abort(403, 'Unauthorized access');
+        // Parse parameters
+        $parsed = $this->parseParameters($params);
+        $permissions = $parsed['items'];
+        $guard = $parsed['guard'];
+
+        // Check if permissions are provided
+        if (empty($permissions)) {
+            return $next($request);
         }
 
-        $user = Auth::user();
+        // Get authenticated user
+        $user = $this->getAuthenticatedUser($request, $guard);
 
-        if (!method_exists($user, 'hasAnyPermission')) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'User model must use HasRoles trait'], 500);
-            }
-            abort(500, 'User model must use HasRoles trait');
+        // Check if user is authenticated
+        if (!$user) {
+            throw UnauthorizedException::notLoggedIn();
         }
 
-        if (!$user->hasAnyPermission($permissions)) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Insufficient permissions'], 403);
-            }
-            abort(403, 'Unauthorized - Insufficient permissions');
+        // Check if user model has required trait
+        if (!$this->userHasTrait($user)) {
+            throw UnauthorizedException::missingTrait();
+        }
+
+        // Resolve guard to use
+        $resolvedGuard = $this->resolveGuard($user, $guard);
+
+        // Check if user has any of the required permissions
+        if (!$user->hasAnyPermission(...$permissions)) {
+            throw UnauthorizedException::forPermissions($permissions, $resolvedGuard);
         }
 
         return $next($request);

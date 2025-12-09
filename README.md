@@ -35,4 +35,4 @@ It is designed to be easy to integrate for simple projects, yet powerful enough 
 Use Composer to install the free version:
 
 ```bash
-composer require hinditutorpoint/rbac-suite
+composer require rbac-suite/omni-access

@@ -59,25 +59,11 @@ class RoleObserver
         }
     }
 
-    /**
-     * Clear the cache when a role is restored from a soft delete.
-     *
-     * @param Role $role
-     */
     public function restored(Role $role): void
     {
         $this->clearCache($role);
     }
 
-    /**
-     * Generate a unique slug from a given name.
-     *
-     * This method will generate a slug by first generating a slug with dots, and then
-     * incrementing a counter until a unique slug is found.
-     *
-     * @param string $name
-     * @return string
-     */
     protected function generateUniqueSlug(string $name): string
     {
         $slug = Str::slug($name);

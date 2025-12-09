@@ -1,0 +1,2826 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="OmniAccess - A powerful Laravel RBAC (Role-Based Access Control) package for managing roles and permissions">
+    <meta name="keywords" content="Laravel, RBAC, Roles, Permissions, Access Control, PHP">
+    <meta name="author" content="RbacSuite">
+
+    <title>OmniAccess - Laravel RBAC Package Documentation</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Prism.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --sidebar-width: 280px;
+        }
+
+        [data-bs-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --sidebar-bg: #f8fafc;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-bs-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --code-bg: #0d1117;
+            --sidebar-bg: #1e293b;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 56px);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            z-index: 1020;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav .nav-section {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        .sidebar-nav .nav-section:first-child {
+            margin-top: 0;
+        }
+
+        .sidebar-nav .nav-link {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--primary-color);
+        }
+
+        .sidebar-nav .nav-link.active {
+            border-left-color: var(--primary-color);
+            background-color: var(--bg-tertiary);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 80px 2rem 2rem;
+            min-height: 100vh;
+            max-width: 900px;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+        }
+
+        h4 {
+            font-size: 1.15rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Code Blocks */
+        pre {
+            position: relative;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            background-color: var(--code-bg) !important;
+        }
+
+        pre code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code:not(pre code) {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            padding: 0.2em 0.4em;
+            background-color: var(--bg-tertiary);
+            border-radius: 0.25rem;
+            color: var(--primary-color);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.375rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .copy-btn.copied {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            margin: 1rem 0;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-tertiary);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        /* Badges */
+        .badge-section {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .badge-section img {
+            height: 20px;
+        }
+
+        /* Alerts/Notes */
+        .alert-note {
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-note.info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        .alert-note.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left-color: #f59e0b;
+        }
+
+        .alert-note.danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+        }
+
+        .alert-note.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left-color: #10b981;
+        }
+
+        /* Go to Top Button */
+        .go-top-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        .go-top-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .go-top-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            column-count: 2;
+            column-gap: 2rem;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.5rem;
+            break-inside: avoid;
+        }
+
+        .toc-list a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            border: none;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .feature-card i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .feature-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Mobile Sidebar Toggle */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1015;
+        }
+
+        /* Search Box */
+        .search-box {
+            padding: 0 1.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 80px 1rem 2rem;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .toc-list {
+                column-count: 1;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th,
+            td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Print */
+        @media print {
+
+            .sidebar,
+            .navbar,
+            .go-top-btn,
+            .copy-btn,
+            .theme-toggle {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+        }
+
+        /* Prism.js overrides */
+        pre[class*="language-"] {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        code[class*="language-"],
+        pre[class*="language-"] {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+
+        /* Language badge */
+        pre[class*="language-"]::before {
+            content: attr(data-language);
+            position: absolute;
+            top: 0;
+            left: 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 0.25rem 0.25rem;
+            color: #94a3b8;
+        }
+
+        /* Anchor links */
+        .anchor-link {
+            opacity: 0;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            transition: opacity 0.2s ease;
+        }
+
+        h2:hover .anchor-link,
+        h3:hover .anchor-link,
+        h4:hover .anchor-link {
+            opacity: 1;
+        }
+
+        /* Version Badge */
+        .version-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+
+<body x-data="{ 
+    sidebarOpen: false, 
+    darkMode: localStorage.getItem('theme') === 'dark',
+    showGoTop: false,
+    searchQuery: '',
+    activeSection: ''
+}" x-init="
+    $watch('darkMode', val => {
+        localStorage.setItem('theme', val ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-bs-theme', val ? 'dark' : 'light');
+    });
+    if (darkMode) {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
+    window.addEventListener('scroll', () => {
+        showGoTop = window.scrollY > 300;
+    });
+">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <button class="sidebar-toggle me-3" @click="sidebarOpen = !sidebarOpen">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock"></i>
+                OmniAccess
+                <span class="version-badge">v1.2.0</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="https://github.com/hinditutorpoint/rbac-suite" class="btn btn-sm btn-outline-secondary"
+                    target="_blank">
+                    <i class="bi bi-github me-1"></i>
+                    <span class="d-none d-sm-inline">GitHub</span>
+                </a>
+
+                <button class="theme-toggle" @click="darkMode = !darkMode">
+                    <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
+                    <span class="d-none d-md-inline" x-text="darkMode ? 'Light' : 'Dark'"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" :class="{ 'show': sidebarOpen }" @click="sidebarOpen = false"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" :class="{ 'open': sidebarOpen }">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search documentation..." x-model="searchQuery"
+                @input="filterNav()">
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-section">Getting Started</li>
+            <li><a href="#installation" class="nav-link" @click="sidebarOpen = false">Installation</a></li>
+            <li><a href="#configuration" class="nav-link" @click="sidebarOpen = false">Configuration</a></li>
+            <li><a href="#basic-setup" class="nav-link" @click="sidebarOpen = false">Basic Setup</a></li>
+
+            <li class="nav-section">Core Concepts</li>
+            <li><a href="#managing-roles" class="nav-link" @click="sidebarOpen = false">Managing Roles</a></li>
+            <li><a href="#managing-permissions" class="nav-link" @click="sidebarOpen = false">Managing Permissions</a>
+            </li>
+            <li><a href="#managing-groups" class="nav-link" @click="sidebarOpen = false">Permission Groups</a></li>
+            <li><a href="#assigning-roles" class="nav-link" @click="sidebarOpen = false">Assigning Roles</a></li>
+            <li><a href="#checking-roles-permissions" class="nav-link" @click="sidebarOpen = false">Checking Roles &
+                    Permissions</a></li>
+
+            <li class="nav-section">Features</li>
+            <li><a href="#middleware" class="nav-link" @click="sidebarOpen = false">Middleware</a></li>
+            <li><a href="#blade-directives" class="nav-link" @click="sidebarOpen = false">Blade Directives</a></li>
+            <li><a href="#guard-support" class="nav-link" @click="sidebarOpen = false">Guard Support</a></li>
+            <li><a href="#caching" class="nav-link" @click="sidebarOpen = false">Caching</a></li>
+            <li><a href="#super-admin" class="nav-link" @click="sidebarOpen = false">Super Admin</a></li>
+
+            <li class="nav-section">Advanced</li>
+            <li><a href="#api-usage" class="nav-link" @click="sidebarOpen = false">API Usage</a></li>
+            <li><a href="#artisan-commands" class="nav-link" @click="sidebarOpen = false">Artisan Commands</a></li>
+            <li><a href="#database-seeder" class="nav-link" @click="sidebarOpen = false">Database Seeder</a></li>
+            <li><a href="#testing" class="nav-link" @click="sidebarOpen = false">Testing</a></li>
+
+            <li class="nav-section">Reference</li>
+            <li><a href="#troubleshooting" class="nav-link" @click="sidebarOpen = false">Troubleshooting</a></li>
+            <li><a href="#quick-reference" class="nav-link" @click="sidebarOpen = false">Quick Reference</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>OmniAccess</h1>
+            <p class="hero-subtitle">A powerful and flexible Role-Based Access Control (RBAC) package for Laravel</p>
+            <div class="hero-badges">
+                <img src="https://img.shields.io/packagist/v/rbac-suite/omni-access.svg?style=flat-square"
+                    alt="Latest Version">
+                <img src="https://img.shields.io/packagist/dt/rbac-suite/omni-access.svg?style=flat-square"
+                    alt="Total Downloads">
+                <img src="https://img.shields.io/github/license/rbac-suite/omni-access.svg?style=flat-square"
+                    alt="License">
+                <img src="https://img.shields.io/badge/Laravel-10.x%20%7C%2011.x-red?style=flat-square"
+                    alt="Laravel Version">
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="bi bi-speedometer2"></i>
+                <h4>High Performance</h4>
+                <p>Built-in caching system for blazing fast permission checks</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-shield-check"></i>
+                <h4>Flexible Guards</h4>
+                <p>Support for multiple authentication guards</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-layers"></i>
+                <h4>Permission Groups</h4>
+                <p>Organize permissions into logical groups</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-code-slash"></i>
+                <h4>Blade Directives</h4>
+                <p>Easy-to-use directives for your views</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-terminal"></i>
+                <h4>Artisan Commands</h4>
+                <p>Manage roles and permissions from CLI</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-plug"></i>
+                <h4>API Ready</h4>
+                <p>JSON responses for API-based applications</p>
+            </div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <div class="toc-title"><i class="bi bi-list-ul me-2"></i>Table of Contents</div>
+            <ol class="toc-list">
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#configuration">Configuration</a></li>
+                <li><a href="#basic-setup">Basic Setup</a></li>
+                <li><a href="#managing-roles">Managing Roles</a></li>
+                <li><a href="#managing-permissions">Managing Permissions</a></li>
+                <li><a href="#managing-groups">Permission Groups</a></li>
+                <li><a href="#assigning-roles">Assigning Roles</a></li>
+                <li><a href="#checking-roles-permissions">Checking Roles & Permissions</a></li>
+                <li><a href="#middleware">Middleware</a></li>
+                <li><a href="#blade-directives">Blade Directives</a></li>
+                <li><a href="#guard-support">Guard Support</a></li>
+                <li><a href="#caching">Caching</a></li>
+                <li><a href="#super-admin">Super Admin</a></li>
+                <li><a href="#api-usage">API Usage</a></li>
+                <li><a href="#artisan-commands">Artisan Commands</a></li>
+                <li><a href="#database-seeder">Database Seeder</a></li>
+                <li><a href="#testing">Testing</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#quick-reference">Quick Reference</a></li>
+            </ol>
+        </div>
+
+        <!-- Installation -->
+        <section id="installation">
+            <h2>Installation <a href="#installation" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Step 1: Install via Composer</h3>
+            <pre data-language="bash"><code class="language-bash">composer require rbac-suite/omni-access</code></pre>
+
+            <h3>Step 2: Publish Configuration & Migrations</h3>
+            <pre data-language="bash"><code class="language-bash"># Publish config file
+php artisan vendor:publish --tag=omni-access-config
+
+# Publish migrations
+php artisan vendor:publish --tag=omni-access-migrations
+
+# Publish views (optional - for custom unauthorized page)
+php artisan vendor:publish --tag=omni-access-views
+
+# Or publish everything at once
+php artisan vendor:publish --provider="RbacSuite\OmniAccess\OmniAccessServiceProvider"</code></pre>
+
+            <h3>Step 3: Run Migrations</h3>
+            <pre data-language="bash"><code class="language-bash">php artisan migrate</code></pre>
+
+            <h3>Step 4: Add Trait to User Model</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use RbacSuite\OmniAccess\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasRoles;
+
+    // Optional: Set custom guard for this model
+    protected string $guard_name = 'web';
+    
+    // ... rest of your model
+}</code></pre>
+
+            <div class="alert-note success">
+                <strong><i class="bi bi-check-circle me-2"></i>You're ready to go!</strong>
+                <p class="mb-0">OmniAccess is now installed and ready to use. Continue reading to learn how to configure
+                    and use it.</p>
+            </div>
+        </section>
+
+        <!-- Configuration -->
+        <section id="configuration">
+            <h2>Configuration <a href="#configuration" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <p>The configuration file is located at <code>config/omni-access.php</code>. Here's a complete overview:</p>
+
+            <h3>Basic Configuration</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | User Model
+    |--------------------------------------------------------------------------
+    | The user model class that will have roles and permissions.
+    */
+    'user_model' => App\Models\User::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Primary Key Types
+    |--------------------------------------------------------------------------
+    | Supported: "bigint", "int", "uuid"
+    */
+    'primary_key_type' => 'bigint',
+    'user_primary_key_type' => 'bigint',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Role
+    |--------------------------------------------------------------------------
+    | Users with this role will bypass all permission checks.
+    | Set to null to disable super admin functionality.
+    */
+    'super_admin_role' => 'super-admin',
+];</code></pre>
+
+            <h3>Guards Configuration</h3>
+            <pre data-language="php"><code class="language-php">'guards' => [
+    // Default guard (null = use Laravel's default)
+    'default' => null,
+    
+    // Available guards for roles/permissions
+    'available' => ['web', 'api', 'admin'],
+],</code></pre>
+
+            <h3>Cache Configuration</h3>
+            <pre data-language="php"><code class="language-php">'cache' => [
+    // Enable/disable caching
+    'enabled' => env('OMNI_ACCESS_CACHE_ENABLED', true),
+    
+    // Cache TTL in minutes
+    'expiration_time' => env('OMNI_ACCESS_CACHE_TTL', 60 * 24),
+    
+    // Cache key prefix
+    'key_prefix' => 'omni_access',
+    
+    // Cache store (null = default store)
+    'store' => env('OMNI_ACCESS_CACHE_STORE', null),
+],</code></pre>
+
+            <h3>Middleware Configuration</h3>
+            <pre data-language="php"><code class="language-php">'middleware' => [
+    // Auto-register middleware aliases
+    'register' => true,
+    
+    // Middleware aliases
+    'aliases' => [
+        'role' => \RbacSuite\OmniAccess\Middleware\RoleMiddleware::class,
+        'permission' => \RbacSuite\OmniAccess\Middleware\PermissionMiddleware::class,
+        'role_or_permission' => \RbacSuite\OmniAccess\Middleware\RoleOrPermissionMiddleware::class,
+    ],
+
+    // Validate if guard exists
+    'validate_guard' => true,
+    
+    // If true, role's guard must match exactly
+    'strict_guard' => false,
+
+    'unauthorized' => [
+        // Response type: 'auto', 'json', 'view', 'redirect', 'abort'
+        'response_type' => 'auto',
+        
+        // HTTP status codes
+        'status_code' => [
+            'unauthenticated' => 401,
+            'forbidden' => 403,
+        ],
+
+        // Custom messages
+        'messages' => [
+            'unauthenticated' => 'You must be logged in.',
+            'forbidden_role' => 'You do not have the required role.',
+            'forbidden_permission' => 'You do not have the required permission.',
+        ],
+
+        // View configuration
+        'view' => [
+            'name' => 'errors.unauthorized',
+        ],
+
+        // Redirect configuration
+        'redirect' => [
+            'url' => '/login',
+            'with_message' => true,
+            'message_key' => 'error',
+        ],
+
+        // JSON configuration
+        'json' => [
+            'include_required' => false,
+            'include_user_roles' => false,
+        ],
+    ],
+],</code></pre>
+
+            <h3>Environment Variables</h3>
+            <pre data-language="bash"><code class="language-bash"># .env file
+OMNI_ACCESS_CACHE_ENABLED=true
+OMNI_ACCESS_CACHE_TTL=1440
+OMNI_ACCESS_CACHE_STORE=redis</code></pre>
+        </section>
+
+        <!-- Basic Setup -->
+        <section id="basic-setup">
+            <h2>Basic Setup <a href="#basic-setup" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Creating Your First Roles and Permissions</h3>
+            <pre data-language="php"><code class="language-php">use RbacSuite\OmniAccess\Models\Role;
+use RbacSuite\OmniAccess\Models\Permission;
+use RbacSuite\OmniAccess\Models\Group;
+
+// Create permission groups
+$usersGroup = Group::create([
+    'name' => 'User Management',
+    'slug' => 'users',
+    'sort_order' => 1,
+]);
+
+$postsGroup = Group::create([
+    'name' => 'Post Management', 
+    'slug' => 'posts',
+    'sort_order' => 2,
+]);
+
+// Create permissions
+Permission::create(['name' => 'View Users', 'slug' => 'users.view', 'group_id' => $usersGroup->id]);
+Permission::create(['name' => 'Create Users', 'slug' => 'users.create', 'group_id' => $usersGroup->id]);
+Permission::create(['name' => 'Edit Users', 'slug' => 'users.edit', 'group_id' => $usersGroup->id]);
+Permission::create(['name' => 'Delete Users', 'slug' => 'users.delete', 'group_id' => $usersGroup->id]);
+
+Permission::create(['name' => 'View Posts', 'slug' => 'posts.view', 'group_id' => $postsGroup->id]);
+Permission::create(['name' => 'Create Posts', 'slug' => 'posts.create', 'group_id' => $postsGroup->id]);
+Permission::create(['name' => 'Edit Posts', 'slug' => 'posts.edit', 'group_id' => $postsGroup->id]);
+Permission::create(['name' => 'Delete Posts', 'slug' => 'posts.delete', 'group_id' => $postsGroup->id]);
+
+// Create roles
+$superAdmin = Role::create([
+    'name' => 'Super Administrator',
+    'slug' => 'super-admin',
+    'description' => 'Full system access',
+]);
+
+$admin = Role::create([
+    'name' => 'Administrator',
+    'slug' => 'admin',
+    'description' => 'Administrative access',
+]);
+
+$editor = Role::create([
+    'name' => 'Editor',
+    'slug' => 'editor',
+    'description' => 'Can manage posts',
+]);
+
+// Assign permissions to roles
+$admin->givePermissionTo('users.view', 'users.create', 'users.edit');
+$admin->givePermissionTo('posts.view', 'posts.create', 'posts.edit', 'posts.delete');
+
+$editor->givePermissionTo('posts.view', 'posts.create', 'posts.edit');
+
+// Assign roles to users
+$user = User::find(1);
+$user->assignRole('super-admin');</code></pre>
+        </section>
+
+        <!-- Managing Roles -->
+        <section id="managing-roles">
+            <h2>Managing Roles <a href="#managing-roles" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Create Role</h3>
+            <pre data-language="php"><code class="language-php">use RbacSuite\OmniAccess\Models\Role;
+
+// Simple creation (slug auto-generated from name)
+$role = Role::create(['name' => 'Manager']);
+// slug will be 'manager'
+
+// With all options
+$role = Role::create([
+    'name' => 'Content Manager',
+    'slug' => 'content-manager', // Custom slug
+    'description' => 'Manages all content',
+    'guard_name' => 'web',
+    'is_default' => false,
+]);</code></pre>
+
+            <h3>Find Role</h3>
+            <pre data-language="php"><code class="language-php">// By ID
+$role = Role::find(1);
+
+// By slug
+$role = Role::where('slug', 'admin')->first();
+
+// Using cached method (recommended)
+$role = Role::findBySlugCached('admin');
+
+// Get all roles
+$roles = Role::all();
+
+// Get all cached (recommended for performance)
+$roles = Role::getAllCached();
+
+// Get default role
+$defaultRole = Role::getDefaultRole();</code></pre>
+
+            <h3>Update Role</h3>
+            <pre data-language="php"><code class="language-php">$role = Role::where('slug', 'editor')->first();
+
+$role->update([
+    'name' => 'Content Editor',
+    'description' => 'Updated description',
+]);
+
+// Note: slug is immutable by default (configurable)</code></pre>
+
+            <h3>Delete Role</h3>
+            <pre data-language="php"><code class="language-php">$role = Role::where('slug', 'old-role')->first();
+
+// Soft delete
+$role->delete();
+
+// Force delete (permanently removes)
+$role->forceDelete();
+
+// Restore soft deleted
+$role->restore();
+
+// Get soft deleted roles
+$trashedRoles = Role::onlyTrashed()->get();</code></pre>
+
+            <h3>Role Permissions</h3>
+            <pre data-language="php"><code class="language-php">$role = Role::where('slug', 'editor')->first();
+
+// Give single permission
+$role->givePermissionTo('posts.create');
+
+// Give multiple permissions
+$role->givePermissionTo('posts.create', 'posts.edit', 'posts.view');
+
+// Give permissions using array
+$role->givePermissionTo(['posts.create', 'posts.edit']);
+
+// Give permission using model
+$permission = Permission::where('slug', 'posts.delete')->first();
+$role->givePermissionTo($permission);
+
+// Sync permissions (replace all existing)
+$role->syncPermissions('posts.view', 'posts.edit');
+$role->syncPermissions([]); // Remove all permissions
+
+// Revoke permission
+$role->revokePermissionTo('posts.delete');
+
+// Check if role has permission
+if ($role->hasPermission('posts.create')) {
+    // Role has this permission
+}
+
+// Get all role permissions (cached)
+$permissions = $role->getCachedPermissions();</code></pre>
+        </section>
+
+        <!-- Managing Permissions -->
+        <section id="managing-permissions">
+            <h2>Managing Permissions <a href="#managing-permissions" class="anchor-link"><i
+                        class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Create Permission</h3>
+            <pre data-language="php"><code class="language-php">use RbacSuite\OmniAccess\Models\Permission;
+
+// Simple creation
+$permission = Permission::create(['name' => 'Create Posts']);
+// slug will be 'create-posts'
+
+// With group
+$permission = Permission::create([
+    'name' => 'Create Posts',
+    'slug' => 'posts.create',
+    'description' => 'Allows creating new blog posts',
+    'group_id' => $contentGroup->id,
+    'guard_name' => 'web',
+]);</code></pre>
+
+            <h3>Find Permission</h3>
+            <pre data-language="php"><code class="language-php">// By ID
+$permission = Permission::find(1);
+
+// By slug
+$permission = Permission::where('slug', 'posts.create')->first();
+
+// Using cached method (recommended)
+$permission = Permission::findBySlugCached('posts.create');
+
+// Get all permissions
+$permissions = Permission::all();
+
+// Get all cached with groups
+$permissions = Permission::getAllCached();</code></pre>
+
+            <h3>Permission Relationships</h3>
+            <pre data-language="php"><code class="language-php">$permission = Permission::where('slug', 'posts.create')->first();
+
+// Get permission's group
+$group = $permission->group;
+
+// Get roles that have this permission
+$roles = $permission->roles;</code></pre>
+        </section>
+
+        <!-- Managing Groups -->
+        <section id="managing-groups">
+            <h2>Managing Permission Groups <a href="#managing-groups" class="anchor-link"><i
+                        class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Create Group</h3>
+            <pre data-language="php"><code class="language-php">use RbacSuite\OmniAccess\Models\Group;
+
+$group = Group::create([
+    'name' => 'Blog Management',
+    'slug' => 'blog',
+    'description' => 'Permissions related to blog posts',
+    'sort_order' => 1,
+    'guard_name' => 'web',
+]);</code></pre>
+
+            <h3>Get Groups with Permissions</h3>
+            <pre data-language="php"><code class="language-php">// Get all groups with permissions
+$groups = Group::with('permissions')->orderBy('sort_order')->get();
+
+// Get cached groups (recommended)
+$groups = Group::getAllCached();
+
+// Iterate through groups
+foreach ($groups as $group) {
+    echo $group->name . "\n";
+    
+    foreach ($group->permissions as $permission) {
+        echo "  - {$permission->name} ({$permission->slug})\n";
+    }
+}</code></pre>
+        </section>
+
+        <!-- Assigning Roles -->
+        <section id="assigning-roles">
+            <h2>Assigning Roles to Users <a href="#assigning-roles" class="anchor-link"><i
+                        class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Assign Roles</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Assign by slug
+$user->assignRole('admin');
+
+// Assign by name
+$user->assignRole('Administrator');
+
+// Assign by model
+$adminRole = Role::where('slug', 'admin')->first();
+$user->assignRole($adminRole);
+
+// Assign multiple roles
+$user->assignRole('editor', 'author');
+
+// Assign multiple roles (array)
+$user->assignRole(['editor', 'author']);
+
+// Assign multiple roles (mixed)
+$editorRole = Role::where('slug', 'editor')->first();
+$user->assignRole('admin', $editorRole, 'author');</code></pre>
+
+            <h3>Remove Roles</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Remove single role
+$user->removeRole('editor');
+
+// Remove multiple roles
+$user->removeRole('editor', 'author');
+
+// Remove using model
+$role = Role::where('slug', 'editor')->first();
+$user->removeRole($role);</code></pre>
+
+            <h3>Sync Roles</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Replace all roles with new ones
+$user->syncRoles('admin', 'editor');
+
+// Replace with array
+$user->syncRoles(['subscriber']);
+
+// Remove all roles
+$user->syncRoles([]);</code></pre>
+
+            <h3>Get User Roles</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Get all roles (Eloquent relationship)
+$roles = $user->roles;
+
+// Get role names as Collection
+$roleNames = $user->getRoleNames();
+// Returns: Collection(['Administrator', 'Editor'])
+
+// Get role slugs as Collection
+$roleSlugs = $user->getRoleSlugs();
+// Returns: Collection(['admin', 'editor'])</code></pre>
+        </section>
+
+        <!-- Checking Roles & Permissions -->
+        <section id="checking-roles-permissions">
+            <h2>Checking Roles & Permissions <a href="#checking-roles-permissions" class="anchor-link"><i
+                        class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Check Roles</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Check single role
+if ($user->hasRole('admin')) {
+    // User is admin
+}
+
+// Check by name
+if ($user->hasRole('Administrator')) {
+    // User is admin
+}
+
+// Check multiple roles (user has ANY of these)
+if ($user->hasRole(['admin', 'editor'])) {
+    // User has admin OR editor
+}
+
+// Using pipe-separated string
+if ($user->hasRole('admin|editor|author')) {
+    // User has admin OR editor OR author
+}
+
+// Using comma-separated string
+if ($user->hasRole('admin,editor,author')) {
+    // User has admin OR editor OR author
+}
+
+// Check ANY role (explicit method)
+if ($user->hasAnyRole('admin', 'editor', 'author')) {
+    // User has at least one of these roles
+}
+
+// Check ALL roles
+if ($user->hasAllRoles('editor', 'author')) {
+    // User has BOTH editor AND author roles
+}
+
+// Check EXACT roles (no more, no less)
+if ($user->hasExactRoles('editor', 'author')) {
+    // User has exactly these roles
+}
+
+// Check with specific guard
+if ($user->hasRole('admin', 'api')) {
+    // User has admin role in 'api' guard
+}</code></pre>
+
+            <h3>Check Permissions</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Check single permission
+if ($user->hasPermission('posts.create')) {
+    // User can create posts
+}
+
+// Check ANY permission
+if ($user->hasAnyPermission('posts.create', 'posts.edit', 'posts.delete')) {
+    // User has at least one of these permissions
+}
+
+// Check ALL permissions
+if ($user->hasAllPermissions('posts.create', 'posts.edit')) {
+    // User has ALL of these permissions
+}
+
+// Using can() method (Laravel Gate compatible)
+if ($user->can('posts.create')) {
+    // User can create posts
+}</code></pre>
+
+            <h3>Get User Permissions</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Get all permissions (from all roles)
+$permissions = $user->getAllPermissions();
+
+// Get permission names
+$permissionNames = $user->getPermissionNames();
+// Returns: Collection(['Create Posts', 'Edit Posts'])
+
+// Get permission slugs
+$permissionSlugs = $user->getPermissionSlugs();
+// Returns: Collection(['posts.create', 'posts.edit'])
+
+// Get permissions grouped by group
+$grouped = $user->getGroupedPermissions();
+// Returns:
+// [
+//     'Post Management' => Collection([Permission, Permission, ...]),
+//     'User Management' => Collection([Permission, Permission, ...]),
+//     'Uncategorized' => Collection([Permission, ...]),
+// ]</code></pre>
+        </section>
+
+        <!-- Middleware -->
+        <section id="middleware">
+            <h2>Middleware Usage <a href="#middleware" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Basic Syntax</h3>
+            <pre data-language="php"><code class="language-php">// routes/web.php or routes/api.php
+
+// Single role
+Route::get('/admin', [AdminController::class, 'index'])
+    ->middleware('role:admin');
+
+// Single permission
+Route::get('/posts/create', [PostController::class, 'create'])
+    ->middleware('permission:posts.create');</code></pre>
+
+            <h3>Multiple Roles/Permissions</h3>
+            <pre data-language="php"><code class="language-php">// Comma-separated (user needs ANY of these)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('role:admin,editor,manager');
+
+// Pipe-separated (user needs ANY of these)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('role:admin|editor|manager');
+
+// Multiple permissions
+Route::get('/posts', [PostController::class, 'index'])
+    ->middleware('permission:posts.view,posts.list');</code></pre>
+
+            <h3>Role OR Permission</h3>
+            <pre data-language="php"><code class="language-php">// User needs EITHER the role OR the permission
+Route::get('/reports', [ReportController::class, 'index'])
+    ->middleware('role_or_permission:admin,reports.view');</code></pre>
+
+            <h3>With Guard</h3>
+            <pre data-language="php"><code class="language-php">// Specify guard in middleware
+Route::get('/api/admin', [ApiAdminController::class, 'index'])
+    ->middleware('role:admin,guard:api');
+
+// Permission with guard
+Route::get('/api/posts', [ApiPostController::class, 'index'])
+    ->middleware('permission:posts.view,guard:api');</code></pre>
+
+            <h3>Route Groups</h3>
+            <pre data-language="php"><code class="language-php">// Apply to route group
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Route::get('/admin/users', [AdminController::class, 'users']);
+    Route::get('/admin/settings', [AdminController::class, 'settings']);
+});
+
+// Nested middleware
+Route::middleware(['auth'])->group(function () {
+    
+    // Admin routes
+    Route::middleware(['role:admin'])->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
+        
+        // User management (needs additional permission)
+        Route::middleware(['permission:users.manage'])->group(function () {
+            Route::resource('users', UserController::class);
+        });
+    });
+    
+    // Editor routes
+    Route::middleware(['role:editor|author'])->prefix('content')->group(function () {
+        Route::resource('posts', PostController::class);
+    });
+});</code></pre>
+
+            <h3>Controller Middleware</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+class PostController extends Controller
+{
+    public function __construct()
+    {
+        // Apply to all methods
+        $this->middleware('auth');
+        
+        // Apply to specific methods
+        $this->middleware('permission:posts.view')->only(['index', 'show']);
+        $this->middleware('permission:posts.create')->only(['create', 'store']);
+        $this->middleware('permission:posts.edit')->only(['edit', 'update']);
+        $this->middleware('permission:posts.delete')->only('destroy');
+    }
+}</code></pre>
+
+            <h3>Middleware Syntax Reference</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Syntax</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>role:admin</code></td>
+                        <td>User must have 'admin' role</td>
+                    </tr>
+                    <tr>
+                        <td><code>role:admin,editor</code></td>
+                        <td>User must have 'admin' OR 'editor' role</td>
+                    </tr>
+                    <tr>
+                        <td><code>role:admin|editor</code></td>
+                        <td>User must have 'admin' OR 'editor' role</td>
+                    </tr>
+                    <tr>
+                        <td><code>role:admin,guard:api</code></td>
+                        <td>Check 'admin' role in 'api' guard</td>
+                    </tr>
+                    <tr>
+                        <td><code>permission:posts.create</code></td>
+                        <td>User must have 'posts.create' permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>role_or_permission:admin,posts.edit</code></td>
+                        <td>User must have 'admin' role OR 'posts.edit' permission</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Blade Directives -->
+        <section id="blade-directives">
+            <h2>Blade Directives <a href="#blade-directives" class="anchor-link"><i class="bi bi-link-45deg"></i></a>
+            </h2>
+
+            <h3>Role Directives</h3>
+            <pre data-language="blade"><code class="language-php">{{-- Check single role --}}
+@role('admin')
+    &lt;a href="/admin">Admin Panel&lt;/a>
+@endrole
+
+{{-- With else --}}
+@role('admin')
+    &lt;a href="/admin">Admin Panel&lt;/a>
+@else
+    &lt;p>You don't have admin access.&lt;/p>
+@endrole
+
+{{-- Check multiple roles (any) --}}
+@hasrole('admin|editor')
+    &lt;p>You are admin or editor&lt;/p>
+@endhasrole
+
+{{-- Check any role --}}
+@hasanyrole('admin|editor|author')
+    &lt;p>You have at least one of these roles&lt;/p>
+@endhasanyrole
+
+{{-- Check all roles --}}
+@hasallroles('editor|author')
+    &lt;p>You are both editor AND author&lt;/p>
+@endhasallroles
+
+{{-- Unless has role --}}
+@unlessrole('admin')
+    &lt;p>You are NOT an admin&lt;/p>
+@endunlessrole</code></pre>
+
+            <h3>Permission Directives</h3>
+            <pre data-language="blade"><code class="language-php">{{-- Check single permission --}}
+@permission('posts.create')
+    &lt;a href="/posts/create" class="btn btn-primary">Create New Post&lt;/a>
+@endpermission
+
+{{-- With else --}}
+@haspermission('posts.delete')
+    &lt;button class="btn btn-danger">Delete Post&lt;/button>
+@else
+    &lt;button class="btn btn-danger" disabled>Delete Post&lt;/button>
+@endhaspermission
+
+{{-- Check any permission --}}
+@hasanypermission('posts.edit|posts.delete')
+    &lt;div class="dropdown">
+        &lt;button class="btn btn-secondary dropdown-toggle">Actions&lt;/button>
+        &lt;div class="dropdown-menu">
+            @haspermission('posts.edit')
+                &lt;a class="dropdown-item" href="#">Edit&lt;/a>
+            @endhaspermission
+            @haspermission('posts.delete')
+                &lt;a class="dropdown-item text-danger" href="#">Delete&lt;/a>
+            @endhaspermission
+        &lt;/div>
+    &lt;/div>
+@endhasanypermission
+
+{{-- Check all permissions --}}
+@hasallpermissions('posts.create|posts.edit|posts.delete')
+    &lt;p>You have full post management access&lt;/p>
+@endhasallpermissions</code></pre>
+
+            <h3>Super Admin Directive</h3>
+            <pre data-language="blade"><code class="language-php">@superadmin
+    &lt;div class="alert alert-info">
+        &lt;i class="fas fa-shield-alt">&lt;/i>
+        You have super admin access - all permissions are granted!
+    &lt;/div>
+@endsuperadmin</code></pre>
+
+            <h3>Practical Example: Navigation Menu</h3>
+            <pre data-language="blade"><code class="language-php">&lt;nav>
+    &lt;ul class="nav">
+        &lt;li>&lt;a href="/">Home&lt;/a>&lt;/li>
+        
+        @role('admin|editor')
+            &lt;li>&lt;a href="/dashboard">Dashboard&lt;/a>&lt;/li>
+        @endrole
+        
+        @permission('posts.view')
+            &lt;li>&lt;a href="/posts">Posts&lt;/a>&lt;/li>
+        @endpermission
+        
+        @permission('users.view')
+            &lt;li>&lt;a href="/users">Users&lt;/a>&lt;/li>
+        @endpermission
+        
+        @superadmin
+            &lt;li>&lt;a href="/admin/settings">Settings&lt;/a>&lt;/li>
+        @endsuperadmin
+    &lt;/ul>
+&lt;/nav></code></pre>
+
+            <h3>Blade Directives Reference</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Directive</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>@role('admin')</code></td>
+                        <td>Check if user has role</td>
+                    </tr>
+                    <tr>
+                        <td><code>@hasrole('admin')</code></td>
+                        <td>Alias for @role</td>
+                    </tr>
+                    <tr>
+                        <td><code>@hasanyrole('admin|editor')</code></td>
+                        <td>Check if user has any role</td>
+                    </tr>
+                    <tr>
+                        <td><code>@hasallroles('editor|author')</code></td>
+                        <td>Check if user has all roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>@unlessrole('admin')</code></td>
+                        <td>Check if user does NOT have role</td>
+                    </tr>
+                    <tr>
+                        <td><code>@permission('posts.create')</code></td>
+                        <td>Check if user has permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>@hasanypermission('...')</code></td>
+                        <td>Check any permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>@hasallpermissions('...')</code></td>
+                        <td>Check all permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>@superadmin</code></td>
+                        <td>Check if user is super admin</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Guard Support -->
+        <section id="guard-support">
+            <h2>Guard Support <a href="#guard-support" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Understanding Guards</h3>
+            <p>Guards determine how users are authenticated. OmniAccess supports multiple guards, allowing different
+                authentication methods for different parts of your application.</p>
+
+            <h3>Guard Priority</h3>
+            <p>When checking roles/permissions, OmniAccess uses this priority:</p>
+            <ol>
+                <li>Guard specified in method call or middleware</li>
+                <li>Guard from user model (<code>$user->guard_name</code>)</li>
+                <li>Config default (<code>config('omni-access.guards.default')</code>)</li>
+                <li>Laravel's default guard (<code>auth.defaults.guard</code>)</li>
+            </ol>
+
+            <h3>Setting User Guard</h3>
+            <pre data-language="php"><code class="language-php">// In User model
+class User extends Authenticatable
+{
+    use HasRoles;
+    
+    protected string $guard_name = 'web';
+}
+
+// API User model (different guard)
+class ApiUser extends Authenticatable
+{
+    use HasRoles;
+    
+    protected string $guard_name = 'api';
+}</code></pre>
+
+            <h3>Creating Roles for Specific Guards</h3>
+            <pre data-language="php"><code class="language-php">// Web admin role
+$webAdmin = Role::create([
+    'name' => 'Web Admin',
+    'slug' => 'web-admin',
+    'guard_name' => 'web',
+]);
+
+// API admin role
+$apiAdmin = Role::create([
+    'name' => 'API Admin',
+    'slug' => 'api-admin',
+    'guard_name' => 'api',
+]);</code></pre>
+
+            <h3>Checking Roles with Guard</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Check role in specific guard
+if ($user->hasRole('api-admin', 'api')) {
+    // User has api-admin role in 'api' guard
+}</code></pre>
+
+            <h3>Middleware with Guard</h3>
+            <pre data-language="php"><code class="language-php">// Check role in specific guard
+Route::middleware('role:admin,guard:api')
+    ->get('/api/admin', [ApiAdminController::class, 'index']);</code></pre>
+        </section>
+
+        <!-- Caching -->
+        <section id="caching">
+            <h2>Caching <a href="#caching" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>How Caching Works</h3>
+            <p>OmniAccess automatically caches:</p>
+            <ul>
+                <li>User's roles</li>
+                <li>User's permissions</li>
+                <li>All roles list</li>
+                <li>All permissions list</li>
+                <li>All groups list</li>
+                <li>Individual role/permission lookups</li>
+            </ul>
+
+            <p>Cache is automatically invalidated when:</p>
+            <ul>
+                <li>Role is created, updated, or deleted</li>
+                <li>Permission is created, updated, or deleted</li>
+                <li>User's roles are changed</li>
+                <li>Role's permissions are changed</li>
+            </ul>
+
+            <h3>Configuration</h3>
+            <pre data-language="php"><code class="language-php">'cache' => [
+    'enabled' => env('OMNI_ACCESS_CACHE_ENABLED', true),
+    'expiration_time' => env('OMNI_ACCESS_CACHE_TTL', 60 * 24),
+    'key_prefix' => 'omni_access',
+    'store' => env('OMNI_ACCESS_CACHE_STORE', null),
+],</code></pre>
+
+            <h3>Manual Cache Management</h3>
+            <pre data-language="php"><code class="language-php">use RbacSuite\OmniAccess\Services\CacheService;
+
+$cache = app(CacheService::class);
+
+// Forget specific user's cache
+$cache->forgetUser($userId);
+
+// Forget specific role cache
+$cache->forgetRole($roleId);
+
+// Forget all roles cache
+$cache->forgetRoles();
+
+// Forget all permissions cache
+$cache->forgetPermissions();
+
+// Flush ALL OmniAccess cache
+$cache->flush();</code></pre>
+
+            <h3>User Cache Methods</h3>
+            <pre data-language="php"><code class="language-php">$user = User::find(1);
+
+// Clear and rebuild user's cache
+$user->refreshPermissionsCache();</code></pre>
+
+            <h3>Disabling Cache for Development</h3>
+            <pre data-language="bash"><code class="language-bash"># .env
+OMNI_ACCESS_CACHE_ENABLED=false</code></pre>
+        </section>
+
+        <!-- Super Admin -->
+        <section id="super-admin">
+            <h2>Super Admin <a href="#super-admin" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Configuration</h3>
+            <pre data-language="php"><code class="language-php">// config/omni-access.php
+
+// Set to null to disable super admin functionality
+'super_admin_role' => 'super-admin',</code></pre>
+
+            <h3>Creating Super Admin</h3>
+            <pre data-language="php"><code class="language-php">// Create the super admin role
+Role::create([
+    'name' => 'Super Administrator',
+    'slug' => 'super-admin',
+    'description' => 'Full system access - bypasses all permission checks',
+]);
+
+// Assign to user
+$user = User::find(1);
+$user->assignRole('super-admin');</code></pre>
+
+            <h3>Super Admin Behavior</h3>
+            <pre data-language="php"><code class="language-php">$superAdmin = User::find(1);
+$superAdmin->assignRole('super-admin');
+
+// Check if user is super admin
+$superAdmin->isSuperAdmin(); // true
+
+// ALL permission checks return true
+$superAdmin->hasPermission('anything'); // true
+$superAdmin->hasPermission('nonexistent.permission'); // true
+$superAdmin->hasAnyPermission('foo', 'bar', 'baz'); // true
+$superAdmin->hasAllPermissions('foo', 'bar', 'baz'); // true
+$superAdmin->can('anything'); // true
+
+// Super admin still respects role checks
+$superAdmin->hasRole('editor'); // false (if not assigned)
+$superAdmin->hasRole('super-admin'); // true</code></pre>
+        </section>
+
+        <!-- API Usage -->
+        <section id="api-usage">
+            <h2>API Usage <a href="#api-usage" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>JSON Responses</h3>
+            <p>OmniAccess automatically returns JSON for API requests:</p>
+
+            <h4>Success Response (200)</h4>
+            <pre data-language="json"><code class="language-json">{
+    "data": { ... }
+}</code></pre>
+
+            <h4>Unauthorized Response (403)</h4>
+            <pre data-language="json"><code class="language-json">{
+    "success": false,
+    "message": "You do not have the required role to access this resource.",
+    "error": {
+        "type": "role",
+        "status_code": 403
+    }
+}</code></pre>
+
+            <h4>With Additional Info</h4>
+            <pre data-language="json"><code class="language-json">{
+    "success": false,
+    "message": "You do not have the required role to access this resource.",
+    "error": {
+        "type": "role",
+        "status_code": 403,
+        "required": ["admin", "manager"],
+        "user_roles": ["editor", "subscriber"],
+        "guard": "api"
+    }
+}</code></pre>
+
+            <h3>API Controller Example</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use RbacSuite\OmniAccess\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+class RbacController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('permission:roles.view')->only(['roles', 'role']);
+        $this->middleware('permission:roles.create')->only('createRole');
+    }
+
+    public function roles(): JsonResponse
+    {
+        $roles = Role::with('permissions')->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $roles->map(fn ($role) => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'slug' => $role->slug,
+                'permissions' => $role->permissions->pluck('slug'),
+            ]),
+        ]);
+    }
+
+    public function myPermissions(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'roles' => $user->getRoleSlugs(),
+                'permissions' => $user->getPermissionSlugs(),
+                'is_super_admin' => $user->isSuperAdmin(),
+            ],
+        ]);
+    }
+}</code></pre>
+        </section>
+
+        <!-- Artisan Commands -->
+        <section id="artisan-commands">
+            <h2>Artisan Commands <a href="#artisan-commands" class="anchor-link"><i class="bi bi-link-45deg"></i></a>
+            </h2>
+
+            <h3>Available Commands</h3>
+            <pre data-language="bash"><code class="language-bash"># Create a new role
+php artisan omni:create-role "Content Manager" --description="Manages content"
+
+# Create a new permission
+php artisan omni:create-permission "Create Posts" --slug=posts.create --group=content
+
+# Assign role to user
+php artisan omni:assign-role 1 admin
+php artisan omni:assign-role user@example.com editor
+
+# List all roles
+php artisan omni:list-roles
+
+# List all permissions
+php artisan omni:list-permissions
+php artisan omni:list-permissions --group=content
+
+# Show user's roles and permissions
+php artisan omni:show-user 1
+php artisan omni:show-user user@example.com
+
+# Clear OmniAccess cache
+php artisan omni:cache-reset</code></pre>
+
+            <h3>Command Output Examples</h3>
+            <pre data-language="bash"><code class="language-bash">$ php artisan omni:list-roles
++----+----------------------+-------------+-------+-------------------+
+| ID | Name                 | Slug        | Guard | Permissions Count |
++----+----------------------+-------------+-------+-------------------+
+| 1  | Super Administrator  | super-admin | web   | 0                 |
+| 2  | Administrator        | admin       | web   | 12                |
+| 3  | Editor               | editor      | web   | 5                 |
++----+----------------------+-------------+-------+-------------------+
+
+$ php artisan omni:show-user admin@example.com
+User: Admin (admin@example.com)
+
+Roles:
++----------------------+-------------+
+| Name                 | Slug        |
++----------------------+-------------+
+| Super Administrator  | super-admin |
++----------------------+-------------+
+
+Permissions:
+  User Management
+    - users.view
+    - users.create
+    - users.edit
+  Post Management
+    - posts.view
+    - posts.create</code></pre>
+        </section>
+
+        <!-- Database Seeder -->
+        <section id="database-seeder">
+            <h2>Database Seeder <a href="#database-seeder" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Example Seeder</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use RbacSuite\OmniAccess\Models\Role;
+use RbacSuite\OmniAccess\Models\Permission;
+use RbacSuite\OmniAccess\Models\Group;
+use App\Models\User;
+
+class RbacSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Create Groups
+        $groups = [
+            ['name' => 'User Management', 'slug' => 'users', 'sort_order' => 1],
+            ['name' => 'Role Management', 'slug' => 'roles', 'sort_order' => 2],
+            ['name' => 'Post Management', 'slug' => 'posts', 'sort_order' => 3],
+        ];
+
+        foreach ($groups as $group) {
+            Group::firstOrCreate(['slug' => $group['slug']], $group);
+        }
+
+        // Create Permissions
+        $permissions = [
+            ['name' => 'View Users', 'slug' => 'users.view', 'group' => 'users'],
+            ['name' => 'Create Users', 'slug' => 'users.create', 'group' => 'users'],
+            ['name' => 'Edit Users', 'slug' => 'users.edit', 'group' => 'users'],
+            ['name' => 'Delete Users', 'slug' => 'users.delete', 'group' => 'users'],
+            ['name' => 'View Posts', 'slug' => 'posts.view', 'group' => 'posts'],
+                        ['name' => 'Create Posts', 'slug' => 'posts.create', 'group' => 'posts'],
+            ['name' => 'Edit Posts', 'slug' => 'posts.edit', 'group' => 'posts'],
+            ['name' => 'Delete Posts', 'slug' => 'posts.delete', 'group' => 'posts'],
+        ];
+
+        foreach ($permissions as $perm) {
+            $group = Group::where('slug', $perm['group'])->first();
+            
+            Permission::firstOrCreate(
+                ['slug' => $perm['slug']],
+                [
+                    'name' => $perm['name'],
+                    'slug' => $perm['slug'],
+                    'group_id' => $group?->id,
+                ]
+            );
+        }
+
+        // Create Roles
+        $roles = [
+            [
+                'name' => 'Super Administrator',
+                'slug' => 'super-admin',
+                'description' => 'Full system access',
+                'permissions' => [],
+            ],
+            [
+                'name' => 'Administrator',
+                'slug' => 'admin',
+                'description' => 'Administrative access',
+                'permissions' => [
+                    'users.view', 'users.create', 'users.edit', 'users.delete',
+                    'posts.view', 'posts.create', 'posts.edit', 'posts.delete',
+                ],
+            ],
+            [
+                'name' => 'Editor',
+                'slug' => 'editor',
+                'description' => 'Can manage posts',
+                'permissions' => ['posts.view', 'posts.create', 'posts.edit'],
+            ],
+        ];
+
+        foreach ($roles as $roleData) {
+            $permissions = $roleData['permissions'];
+            unset($roleData['permissions']);
+            
+            $role = Role::firstOrCreate(
+                ['slug' => $roleData['slug']],
+                $roleData
+            );
+            
+            if (!empty($permissions)) {
+                $role->syncPermissions($permissions);
+            }
+        }
+
+        // Create Super Admin User
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => bcrypt('password'),
+            ]
+        );
+        $superAdmin->assignRole('super-admin');
+
+        $this->command->info('RBAC seeded successfully!');
+    }
+}</code></pre>
+
+            <h3>Run Seeder</h3>
+            <pre data-language="bash"><code class="language-bash">php artisan db:seed --class=RbacSeeder</code></pre>
+        </section>
+
+        <!-- Testing -->
+        <section id="testing">
+            <h2>Testing <a href="#testing" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Feature Tests</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use RbacSuite\OmniAccess\Models\Role;
+use RbacSuite\OmniAccess\Models\Permission;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class RbacTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Clear cache before each test
+        app(\RbacSuite\OmniAccess\Services\CacheService::class)->flush();
+    }
+
+    public function test_user_can_be_assigned_role(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create(['name' => 'Admin', 'slug' => 'admin']);
+        
+        $user->assignRole('admin');
+        
+        $this->assertTrue($user->hasRole('admin'));
+        $this->assertTrue($user->hasRole('Admin'));
+    }
+
+    public function test_user_can_have_multiple_roles(): void
+    {
+        $user = User::factory()->create();
+        Role::create(['name' => 'Editor', 'slug' => 'editor']);
+        Role::create(['name' => 'Author', 'slug' => 'author']);
+        
+        $user->assignRole('editor', 'author');
+        
+        $this->assertTrue($user->hasAllRoles('editor', 'author'));
+        $this->assertCount(2, $user->roles);
+    }
+
+    public function test_user_has_permission_through_role(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create(['name' => 'Editor', 'slug' => 'editor']);
+        Permission::create(['name' => 'Create Posts', 'slug' => 'posts.create']);
+        
+        $role->givePermissionTo('posts.create');
+        $user->assignRole('editor');
+        
+        $this->assertTrue($user->hasPermission('posts.create'));
+    }
+
+    public function test_super_admin_has_all_permissions(): void
+    {
+        $user = User::factory()->create();
+        Role::create(['name' => 'Super Admin', 'slug' => 'super-admin']);
+        Permission::create(['name' => 'Anything', 'slug' => 'anything.really']);
+        
+        $user->assignRole('super-admin');
+        
+        $this->assertTrue($user->isSuperAdmin());
+        $this->assertTrue($user->hasPermission('anything.really'));
+        $this->assertTrue($user->hasPermission('nonexistent.permission'));
+    }
+
+    public function test_role_middleware_blocks_unauthorized(): void
+    {
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)
+            ->get('/admin');
+        
+        $response->assertStatus(403);
+    }
+
+    public function test_role_middleware_allows_authorized(): void
+    {
+        $user = User::factory()->create();
+        Role::create(['name' => 'Admin', 'slug' => 'admin']);
+        $user->assignRole('admin');
+        
+        $response = $this->actingAs($user)
+            ->get('/admin');
+        
+        $response->assertStatus(200);
+    }
+
+    public function test_sync_roles_replaces_all_roles(): void
+    {
+        $user = User::factory()->create();
+        Role::create(['name' => 'Admin', 'slug' => 'admin']);
+        Role::create(['name' => 'Editor', 'slug' => 'editor']);
+        Role::create(['name' => 'Author', 'slug' => 'author']);
+        
+        $user->assignRole('admin', 'editor');
+        $this->assertCount(2, $user->roles);
+        
+        $user->syncRoles('author');
+        $user->refresh();
+        
+        $this->assertCount(1, $user->roles);
+        $this->assertTrue($user->hasRole('author'));
+        $this->assertFalse($user->hasRole('admin'));
+    }
+}</code></pre>
+
+            <h3>API Tests</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace Tests\Feature\Api;
+
+use Tests\TestCase;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+use RbacSuite\OmniAccess\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class RbacApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_api_returns_json_for_unauthorized(): void
+    {
+        $user = User::factory()->create();
+        
+        Sanctum::actingAs($user);
+        
+        $response = $this->getJson('/api/admin');
+        
+        $response->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'error' => [
+                    'type' => 'role',
+                    'status_code' => 403,
+                ],
+            ]);
+    }
+
+    public function test_api_returns_user_permissions(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create(['name' => 'Editor', 'slug' => 'editor']);
+        $role->givePermissionTo('posts.edit');
+        $user->assignRole('editor');
+        
+        Sanctum::actingAs($user);
+        
+        $response = $this->getJson('/api/me/permissions');
+        
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'roles' => ['editor'],
+                    'is_super_admin' => false,
+                ],
+            ]);
+    }
+}</code></pre>
+
+            <h3>Test Helper Trait</h3>
+            <pre data-language="php"><code class="language-php">&lt;?php
+
+namespace Tests;
+
+use RbacSuite\OmniAccess\Models\Role;
+use RbacSuite\OmniAccess\Models\Permission;
+
+trait RbacTestHelpers
+{
+    protected function createRole(string $name, ?string $slug = null): Role
+    {
+        return Role::create([
+            'name' => $name,
+            'slug' => $slug ?? \Str::slug($name),
+        ]);
+    }
+
+    protected function createPermission(string $slug, ?string $name = null): Permission
+    {
+        return Permission::create([
+            'name' => $name ?? ucwords(str_replace('.', ' ', $slug)),
+            'slug' => $slug,
+        ]);
+    }
+
+    protected function createUserWithRole(string $role): \App\Models\User
+    {
+        $user = \App\Models\User::factory()->create();
+        $this->createRole(ucfirst($role), $role);
+        $user->assignRole($role);
+        return $user;
+    }
+
+    protected function createUserWithPermission(string $permission): \App\Models\User
+    {
+        $role = $this->createRole('Test Role');
+        $perm = $this->createPermission($permission);
+        $role->givePermissionTo($perm);
+        
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole($role);
+        return $user;
+    }
+}</code></pre>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting <a href="#troubleshooting" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>Common Issues</h3>
+
+            <h4>1. "User model must use HasRoles trait"</h4>
+            <div class="alert-note danger">
+                <strong>Problem:</strong> Middleware throws error about missing trait.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution: Add HasRoles trait to User model
+use RbacSuite\OmniAccess\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasRoles; // Add this trait
+}</code></pre>
+
+            <h4>2. Permissions not updating after role change</h4>
+            <div class="alert-note warning">
+                <strong>Problem:</strong> User still has old permissions after role modification.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution: Clear user's cache
+$user->refreshPermissionsCache();
+
+// Or clear all cache via artisan
+php artisan omni:cache-reset</code></pre>
+
+            <h4>3. Middleware not working</h4>
+            <div class="alert-note warning">
+                <strong>Problem:</strong> <code>role</code> or <code>permission</code> middleware not found.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution 1: Check config - make sure register is true
+'middleware' => [
+    'register' => true,
+],
+
+// Solution 2: Manually register in app/Http/Kernel.php
+protected $middlewareAliases = [
+    'role' => \RbacSuite\OmniAccess\Middleware\RoleMiddleware::class,
+    'permission' => \RbacSuite\OmniAccess\Middleware\PermissionMiddleware::class,
+    'role_or_permission' => \RbacSuite\OmniAccess\Middleware\RoleOrPermissionMiddleware::class,
+];</code></pre>
+
+            <h4>4. UUID primary keys not working</h4>
+            <div class="alert-note warning">
+                <strong>Problem:</strong> UUID columns not auto-generating.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution: Ensure config is correct and run fresh migrations
+'primary_key_type' => 'uuid',
+'user_primary_key_type' => 'uuid',
+
+// Then run:
+php artisan migrate:fresh</code></pre>
+
+            <h4>5. Cache not clearing properly</h4>
+            <div class="alert-note warning">
+                <strong>Problem:</strong> File cache doesn't support <code>flush()</code> properly.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution: Use Redis or manually clear specific keys
+'cache' => [
+    'store' => 'redis',
+],
+
+// Or manually clear:
+$cache = app(CacheService::class);
+$cache->forgetUser($userId);
+$cache->forgetRoles();
+$cache->forgetPermissions();</code></pre>
+
+            <h4>6. Guard mismatch errors</h4>
+            <div class="alert-note warning">
+                <strong>Problem:</strong> Role has different guard than user.
+            </div>
+            <pre data-language="php"><code class="language-php">// Solution: Ensure guards match or disable strict checking
+$role = Role::create([
+    'name' => 'API Admin',
+    'guard_name' => 'api', // Must match user's guard
+]);
+
+// Or disable strict guard checking in config
+'middleware' => [
+    'strict_guard' => false,
+],</code></pre>
+
+            <h3>Debug Tips</h3>
+            <pre data-language="php"><code class="language-php">// Check user's current state
+$user = User::find(1);
+
+dump([
+    'roles' => $user->getRoleSlugs()->toArray(),
+    'permissions' => $user->getPermissionSlugs()->toArray(),
+    'is_super_admin' => $user->isSuperAdmin(),
+    'guard' => $user->getGuardName(),
+]);
+
+// Check role's permissions
+$role = Role::where('slug', 'editor')->first();
+dump($role->getCachedPermissions()->pluck('slug')->toArray());</code></pre>
+
+            <h3>Debug via Artisan</h3>
+            <pre data-language="bash"><code class="language-bash"># Show user's roles and permissions
+php artisan omni:show-user user@example.com
+
+# List all roles
+php artisan omni:list-roles
+
+# List all permissions
+php artisan omni:list-permissions
+
+# Clear cache
+php artisan omni:cache-reset</code></pre>
+        </section>
+
+        <!-- Quick Reference -->
+        <section id="quick-reference">
+            <h2>Quick Reference <a href="#quick-reference" class="anchor-link"><i class="bi bi-link-45deg"></i></a></h2>
+
+            <h3>User Methods</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>$user->assignRole('admin')</code></td>
+                        <td>Assign role(s) to user</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->removeRole('admin')</code></td>
+                        <td>Remove role(s) from user</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->syncRoles('admin', 'editor')</code></td>
+                        <td>Replace all roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasRole('admin')</code></td>
+                        <td>Check if user has role</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasAnyRole('admin', 'editor')</code></td>
+                        <td>Check if user has any role</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasAllRoles('editor', 'author')</code></td>
+                        <td>Check if user has all roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasExactRoles('editor')</code></td>
+                        <td>Check if user has exactly these roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasPermission('posts.create')</code></td>
+                        <td>Check if user has permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasAnyPermission(...)</code></td>
+                        <td>Check any permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->hasAllPermissions(...)</code></td>
+                        <td>Check all permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->can('posts.create')</code></td>
+                        <td>Laravel Gate compatible check</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->isSuperAdmin()</code></td>
+                        <td>Check if user is super admin</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getRoleNames()</code></td>
+                        <td>Get Collection of role names</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getRoleSlugs()</code></td>
+                        <td>Get Collection of role slugs</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getPermissionNames()</code></td>
+                        <td>Get Collection of permission names</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getPermissionSlugs()</code></td>
+                        <td>Get Collection of permission slugs</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getAllPermissions()</code></td>
+                        <td>Get all permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->getGroupedPermissions()</code></td>
+                        <td>Get permissions grouped by group</td>
+                    </tr>
+                    <tr>
+                        <td><code>$user->refreshPermissionsCache()</code></td>
+                        <td>Clear and rebuild cache</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Role Methods</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>$role->givePermissionTo('posts.create')</code></td>
+                        <td>Assign permission(s) to role</td>
+                    </tr>
+                    <tr>
+                        <td><code>$role->revokePermissionTo('posts.create')</code></td>
+                        <td>Remove permission from role</td>
+                    </tr>
+                    <tr>
+                        <td><code>$role->syncPermissions(...)</code></td>
+                        <td>Replace all permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>$role->hasPermission('posts.create')</code></td>
+                        <td>Check if role has permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>$role->getCachedPermissions()</code></td>
+                        <td>Get all role permissions (cached)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Role::findBySlugCached('admin')</code></td>
+                        <td>Find role by slug (cached)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Role::getAllCached()</code></td>
+                        <td>Get all roles (cached)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Role::getDefaultRole()</code></td>
+                        <td>Get default role</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Artisan Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>php artisan omni:create-role "Name"</code></td>
+                        <td>Create new role</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:create-permission "Name"</code></td>
+                        <td>Create new permission</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:assign-role {user} {role}</code></td>
+                        <td>Assign role to user</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:list-roles</code></td>
+                        <td>List all roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:list-permissions</code></td>
+                        <td>List all permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:show-user {user}</code></td>
+                        <td>Show user's roles/permissions</td>
+                    </tr>
+                    <tr>
+                        <td><code>php artisan omni:cache-reset</code></td>
+                        <td>Clear all OmniAccess cache</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-5 pt-4 border-top text-center">
+            <div class="mb-3">
+                <a href="https://github.com/hinditutorpoint/rbac-suite" class="btn btn-outline-secondary me-2"
+                    target="_blank">
+                    <i class="bi bi-github me-1"></i> GitHub
+                </a>
+                <a href="https://packagist.org/packages/rbac-suite/omni-access" class="btn btn-outline-secondary me-2"
+                    target="_blank">
+                    <i class="bi bi-box me-1"></i> Packagist
+                </a>
+                <a href="mailto:hinditutorpoint@gmail.com" class="btn btn-outline-secondary">
+                    <i class="bi bi-envelope me-1"></i> Support
+                </a>
+            </div>
+            <p class="text-muted">
+                <small>
+                    OmniAccess is released under the MIT License.<br>
+                    &copy; 2025 RbacSuite. All rights reserved.
+                </small>
+            </p>
+            <p class="mb-0">
+                <small class="text-muted">Made with <i class="bi bi-heart-fill text-danger"></i> for the Laravel
+                    community</small>
+            </p>
+        </footer>
+    </main>
+
+    <!-- Go to Top Button -->
+    <button class="go-top-btn" :class="{ 'visible': showGoTop }"
+        @click="window.scrollTo({ top: 0, behavior: 'smooth' })" title="Go to top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- Prism.js -->
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup-templating.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add copy buttons to all code blocks
+            document.querySelectorAll('pre').forEach(function (pre) {
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+
+                button.addEventListener('click', async function () {
+                    const code = pre.querySelector('code');
+                    const text = code ? code.textContent : pre.textContent;
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        button.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+                        button.classList.add('copied');
+
+                        setTimeout(function () {
+                            button.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                            button.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy:', err);
+                        button.innerHTML = '<i class="bi bi-x"></i> Failed';
+
+                        setTimeout(function () {
+                            button.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                        }, 2000);
+                    }
+                });
+
+                pre.style.position = 'relative';
+                pre.appendChild(button);
+            });
+
+            // Highlight active sidebar link on scroll
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+
+            function highlightActiveSection() {
+                const scrollPos = window.scrollY + 100;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === '#' + sectionId) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', highlightActiveSection);
+            highlightActiveSection();
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        const offsetTop = target.offsetTop - 70;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Search functionality
+            window.filterNav = function () {
+                const searchQuery = document.querySelector('.search-input').value.toLowerCase();
+                const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+                const navSections = document.querySelectorAll('.sidebar-nav .nav-section');
+
+                if (!searchQuery) {
+                    navLinks.forEach(link => link.style.display = '');
+                    navSections.forEach(section => section.style.display = '');
+                    return;
+                }
+
+                navLinks.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    if (text.includes(searchQuery)) {
+                        link.style.display = '';
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                // Hide section headers if all their links are hidden
+                navSections.forEach(section => {
+                    let nextElement = section.nextElementSibling;
+                    let hasVisibleLinks = false;
+
+                    while (nextElement && !nextElement.classList.contains('nav-section')) {
+                        if (nextElement.querySelector('.nav-link') &&
+                            nextElement.querySelector('.nav-link').style.display !== 'none') {
+                            hasVisibleLinks = true;
+                            break;
+                        }
+                        if (nextElement.classList.contains('nav-link') &&
+                            nextElement.style.display !== 'none') {
+                            hasVisibleLinks = true;
+                            break;
+                        }
+                        nextElement = nextElement.nextElementSibling;
+                    }
+
+                    section.style.display = hasVisibleLinks ? '' : 'none';
+                });
+            };
+
+            // Add language labels to code blocks
+            document.querySelectorAll('pre[data-language]').forEach(pre => {
+                const lang = pre.getAttribute('data-language');
+                pre.setAttribute('data-language', lang.toUpperCase());
+            });
+
+            // Initialize Prism
+            Prism.highlightAll();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Ctrl/Cmd + K to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('.search-input').focus();
+            }
+
+            // Escape to close sidebar on mobile
+            if (e.key === 'Escape') {
+                const sidebarOpen = document.querySelector('.sidebar.open');
+                if (sidebarOpen) {
+                    sidebarOpen.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
