@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use RbacSuite\OmniAccess\Exceptions\UnauthorizedException;
 
 class UnauthorizedResponseService
@@ -74,8 +76,8 @@ class UnauthorizedResponseService
         }
 
         // Include user roles if configured
-        if (($config['include_user_roles'] ?? false) && auth()->check()) {
-            $user = auth()->user();
+        if (($config['include_user_roles'] ?? false) && Auth::check()) {
+            $user = Auth::user();
             if (method_exists($user, 'roles')) {
                 $data['error']['user_roles'] = $user->roles->pluck('slug')->toArray();
             }
@@ -95,31 +97,37 @@ class UnauthorizedResponseService
     protected function viewResponse(UnauthorizedException $exception): Response
     {
         $config = config('omni-access.middleware.unauthorized.view', []);
-        
+    
         $viewName = $config['name'] ?? 'errors.unauthorized';
-        $layout = $config['layout'] ?? null;
-        $additionalData = $config['data'] ?? [];
+        $layout   = $config['layout'] ?? null;
+        $extra    = $config['data'] ?? [];
 
         $data = array_merge([
             'exception' => $exception,
-            'message' => $exception->getMessage(),
-            'type' => $exception->getType(),
-            'required' => $exception->getRequiredItems(),
-            'guard' => $exception->getGuard(),
-        ], $additionalData);
+            'message'   => $exception->getMessage(),
+            'type'      => $exception->getType(),
+            'required'  => $exception->getRequiredItems(),
+            'guard'     => $exception->getGuard(),
+        ], $extra);
 
-        // Check if view exists
         if (!view()->exists($viewName)) {
             return $this->abortResponse($exception);
         }
 
-        $view = view($viewName, $data);
+        $content = view($viewName, $data)->render();
 
-        if ($layout && view()->exists($layout)) {
-            $view = $view->layout($layout);
+        // If no layout configured → return page directly
+        if (!$layout || !view()->exists($layout)) {
+            return response($content, $exception->getStatusCode());
         }
 
-        return response($view, $exception->getStatusCode());
+        // Wrap inside layout
+        $wrapped = view($layout, [
+            '__content' => $content,
+            '__layout'  => $layout, // For @extends
+        ]);
+
+        return response($wrapped, $exception->getStatusCode());
     }
 
     /**
@@ -135,7 +143,7 @@ class UnauthorizedResponseService
         $messageKey = $config['message_key'] ?? 'error';
 
         // Use route name if provided
-        if ($routeName && \Route::has($routeName)) {
+        if ($routeName && Route::has($routeName)) {
             $url = route($routeName);
         }
 

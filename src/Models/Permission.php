@@ -74,6 +74,22 @@ class Permission extends Model
     }
 
     /**
+     * Scope to filter by group
+     */
+    public function scopeInGroup($query, $groupId)
+    {
+        return $query->where('group_id', $groupId);
+    }
+
+    /**
+     * Get formatted name
+     */
+    public function getFormattedNameAttribute()
+    {
+        return ucfirst(str_replace('.', ' ', $this->slug));
+    }
+
+    /**
      * Scope for active groups
      */
     public function scopeActive($query)

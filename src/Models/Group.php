@@ -75,7 +75,7 @@ class Group extends Model
      */
     public function scopeActive(Builder $query) : Builder
     {
-        return $query->where('active', true);
+        return $query->where('is_active', true);
     }
 
     /**

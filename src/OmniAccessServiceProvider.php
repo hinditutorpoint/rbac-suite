@@ -11,6 +11,8 @@ use RbacSuite\OmniAccess\Services\CacheService;
 use RbacSuite\OmniAccess\Services\ValidationService;
 use RbacSuite\OmniAccess\Services\UnauthorizedResponseService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Configuration\Exceptions;
+use RbacSuite\OmniAccess\Exceptions\OmniAccessExceptionRegistrar;
 
 class OmniAccessServiceProvider extends ServiceProvider
 {
@@ -161,9 +163,8 @@ class OmniAccessServiceProvider extends ServiceProvider
      */
     protected function registerExceptionHandler(): void
     {
-        $this->app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class)
-            ->renderable(function (\RbacSuite\OmniAccess\Exceptions\UnauthorizedException $e, $request) {
-                return app(UnauthorizedResponseService::class)->handle($request, $e);
-            });
+        $this->app->resolving(Exceptions::class, function (Exceptions $exceptions) {
+            (new OmniAccessExceptionRegistrar())($exceptions);
+        });
     }
 }

@@ -3,6 +3,7 @@
 namespace RbacSuite\OmniAccess\Observers;
 
 use RbacSuite\OmniAccess\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use RbacSuite\OmniAccess\Services\CacheService;
 use Illuminate\Support\Str;
 
@@ -21,7 +22,7 @@ class RoleObserver
             $role->slug = $this->generateUniqueSlug($role->name);
         }
         if (empty($role->guard_name)) {
-            $role->guard_name = auth()->getDefaultDriver() ?? 'web';
+            $role->guard_name = Auth::getDefaultDriver() ?? 'web';
         }
     }
 
