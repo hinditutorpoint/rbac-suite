@@ -47,7 +47,7 @@ class GroupObserver
 
     protected function clearCache(Group $group): void
     {
-        $this->cache->forgotGroup($group->id);
+        $this->cache->forgetGroup($group->id);
         $this->cache->forgetPermissions();
     }
 

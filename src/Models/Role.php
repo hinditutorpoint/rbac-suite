@@ -6,22 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RbacSuite\OmniAccess\Services\CacheService;
-use RbacSuite\OmniAccess\Traits\HasPrimaryKeyType;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Builder;
 
 class Role extends Model
 {
-    use HasPrimaryKeyType, SoftDeletes;
+    use HasUuids, SoftDeletes;
 
     protected $fillable = [
         'name',
         'slug',
+        'color',
+        'icon',
         'guard_name',
         'description',
         'is_default',
+        'is_active',
     ];
 
     protected $casts = [
         'is_default' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function __construct(array $attributes = [])
@@ -150,4 +155,47 @@ class Role extends Model
     {
         return static::where('is_default', true)->first();
     }
+
+    public static function getDefaultRoleCached(): ?self
+    {
+        $cache = app(CacheService::class);
+        
+        return $cache->remember('roles.default', function () {
+            return static::getDefaultRole();
+        });
+    }
+
+    /**
+     * Scope a query to only include popular groups, ordered by the number of permissions they have.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePopular(Builder $query) : Builder
+    {
+        return $query->withCount('permissions')->orderBy('permissions_count', 'desc');
+    }
+
+    /**
+     * Scope a query to only include active groups.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive(Builder $query) : Builder
+    {
+        return $query->where('active', true);
+    }
+
+    /**
+     * Scope a query to order the groups by their sort order.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrdered(Builder $query) : Builder
+    {
+        return $query->orderBy('name');
+    }
+
 }

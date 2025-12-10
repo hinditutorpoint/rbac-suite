@@ -17,17 +17,16 @@ trait HasPrimaryKeyType
         });
     }
 
-    public function getIncrementing(): bool
+    protected function initializeHasPrimaryKeyType()
     {
         $primaryKeyType = config('omni-access.primary_key_type', 'bigint');
 
-        return $primaryKeyType !== 'uuid';
-    }
-
-    public function getKeyType(): string
-    {
-        $primaryKeyType = config('omni-access.primary_key_type', 'bigint');
-
-        return $primaryKeyType === 'uuid' ? 'string' : 'int';
+        if ($primaryKeyType === 'uuid') {
+            $this->keyType = 'string';
+            $this->incrementing = false;
+        } else {
+            $this->keyType = 'int';
+            $this->incrementing = true;
+        }
     }
 }

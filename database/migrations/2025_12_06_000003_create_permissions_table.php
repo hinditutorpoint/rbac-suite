@@ -27,6 +27,7 @@ return new class extends Migration
                 $table->string('slug')->unique();
                 $table->string('guard_name')->default('web');
                 $table->text('description')->nullable();
+                $table->boolean('is_active')->default(true);
                 
                 // Foreign key to groups
                 if ($primaryKeyType === 'uuid') {

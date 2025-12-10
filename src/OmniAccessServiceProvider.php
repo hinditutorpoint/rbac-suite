@@ -10,6 +10,7 @@ use RbacSuite\OmniAccess\Commands\ClearCacheCommand;
 use RbacSuite\OmniAccess\Services\CacheService;
 use RbacSuite\OmniAccess\Services\ValidationService;
 use RbacSuite\OmniAccess\Services\UnauthorizedResponseService;
+use Illuminate\Support\Facades\Auth;
 
 class OmniAccessServiceProvider extends ServiceProvider
 {
@@ -90,61 +91,61 @@ class OmniAccessServiceProvider extends ServiceProvider
 
         /* @role('admin') */
         Blade::if('role', function ($role) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasRole(...$normalize($role));
+            return Auth::check()
+                && Auth::user()->hasRole(...$normalize($role));
         });
 
         /* @hasrole('admin') */
         Blade::if('hasrole', function ($role) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasRole(...$normalize($role));
+            return Auth::check()
+                && Auth::user()->hasRole(...$normalize($role));
         });
 
         /* @unlessrole('admin') */
         Blade::if('unlessrole', function ($role) use ($normalize) {
-            return auth()->check()
-                && !auth()->user()->hasRole(...$normalize($role));
+            return Auth::check()
+                && !Auth::user()->hasRole(...$normalize($role));
         });
 
         /* @hasanyrole('admin|editor') */
         Blade::if('hasanyrole', function ($roles) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasAnyRole(...$normalize($roles));
+            return Auth::check()
+                && Auth::user()->hasAnyRole(...$normalize($roles));
         });
 
         /* @hasallroles('admin|editor') */
         Blade::if('hasallroles', function ($roles) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasAllRoles(...$normalize($roles));
+            return Auth::check()
+                && Auth::user()->hasAllRoles(...$normalize($roles));
         });
 
         /* @permission('posts.create') */
         Blade::if('permission', function ($permission) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasPermission(...$normalize($permission));
+            return Auth::check()
+                && Auth::user()->hasPermission(...$normalize($permission));
         });
 
         /* @haspermission('posts.create') */
         Blade::if('haspermission', function ($permission) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasPermission(...$normalize($permission));
+            return Auth::check()
+                && Auth::user()->hasPermission(...$normalize($permission));
         });
 
         /* @hasanypermission('posts.create|posts.edit') */
         Blade::if('hasanypermission', function ($permissions) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasAnyPermission(...$normalize($permissions));
+            return Auth::check()
+                && Auth::user()->hasAnyPermission(...$normalize($permissions));
         });
 
         /* @hasallpermissions('posts.create|posts.edit') */
         Blade::if('hasallpermissions', function ($permissions) use ($normalize) {
-            return auth()->check()
-                && auth()->user()->hasAllPermissions(...$normalize($permissions));
+            return Auth::check()
+                && Auth::user()->hasAllPermissions(...$normalize($permissions));
         });
 
         /* @superadmin */
         Blade::if('superadmin', function () {
-            return auth()->check() && auth()->user()->isSuperAdmin();
+            return Auth::check() && Auth::user()->isSuperAdmin();
         });
     }
 

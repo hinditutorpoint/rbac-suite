@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use RbacSuite\OmniAccess\Traits\HasPrimaryKeyType;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Permission extends Model
 {
-    use HasPrimaryKeyType, SoftDeletes;
+    use HasUuids, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -18,6 +18,11 @@ class Permission extends Model
         'guard_name',
         'description',
         'group_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function __construct(array $attributes = [])
@@ -66,5 +71,21 @@ class Permission extends Model
         return $cache->remember("permission.slug.{$slug}", function () use ($slug) {
             return static::where('slug', $slug)->first();
         });
+    }
+
+    /**
+     * Scope for active groups
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope for ordering
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('name');
     }
 }
