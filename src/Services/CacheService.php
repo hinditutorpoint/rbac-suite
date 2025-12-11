@@ -149,12 +149,21 @@ class CacheService
     }
 
     /**
+     * Forget user's direct permissions cache
+     */
+    public function forgetUserDirectPermissions(int|string $userId): void
+    {
+        $this->forget("user.{$userId}.direct_permissions");
+    }
+
+    /**
      * Forget user cache
      */
     public function forgetUser(int|string $userId): void
     {
         $this->forget("user.{$userId}.roles");
         $this->forget("user.{$userId}.permissions");
+        $this->forget("user.{$userId}.direct_permissions");
     }
 
     /**

@@ -43,6 +43,7 @@ return new class extends Migration
                 
                 $table->index('slug');
                 $table->index('group_id');
+                $table->index('is_active');
                 
                 $table->foreign('group_id')
                     ->references('id')

@@ -35,6 +35,7 @@ return new class extends Migration
                 
                 $table->index('slug');
                 $table->index('sort_order');
+                $table->index('is_active');
             });
         }
     }

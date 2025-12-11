@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Builder;
+use RbacSuite\OmniAccess\Traits\HasActiveStatus;
+use RbacSuite\OmniAccess\Services\CacheService;
 
 class Group extends Model
 {
-    use HasUuids;
+    use HasUuids, HasActiveStatus;
 
     protected $fillable = [
         'name',
@@ -25,6 +27,10 @@ class Group extends Model
     protected $casts = [
         'sort_order' => 'integer',
         'is_active' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'is_active' => true,
     ];
 
     public function __construct(array $attributes = [])
@@ -47,13 +53,51 @@ class Group extends Model
         return $this->hasMany(Permission::class, 'group_id')->orderBy('name');
     }
 
+    /**
+     * Active permissions in this group
+     */
+    public function activePermissions(): HasMany
+    {
+        return $this->hasMany(Permission::class, 'group_id')
+            ->where('is_active', true)
+            ->orderBy('name');
+    }
+
     public static function getAllCached()
     {
-        $cache = app(\RbacSuite\OmniAccess\Services\CacheService::class);
-        
-        return $cache->remember('groups.all', function () {
-            return static::with('permissions')->orderBy('sort_order')->get();
+        $cache = app(CacheService::class);
+
+        return $cache->remember('groups.all.active', function () {
+            return static::with(['permissions' => function ($query) {
+                $query->where('is_active', true);
+            }])->orderBy('sort_order')->get();
         });
+    }
+
+    /**
+     * Get all including inactive
+     */
+    public static function getAllWithInactiveCached()
+    {
+        $cache = app(CacheService::class);
+
+        return $cache->remember('groups.all.with_inactive', function () {
+            return static::withInactive()
+                ->with('permissions')
+                ->orderBy('sort_order')
+                ->get();
+        });
+    }
+
+    /**
+     * Clear status cache
+     */
+    protected function clearStatusCache(): void
+    {
+        $cache = app(CacheService::class);
+        $cache->forgetGroups();
+        $cache->forget('groups.all.active');
+        $cache->forget('groups.all.with_inactive');
     }
 
     /**
@@ -65,17 +109,6 @@ class Group extends Model
     public function scopePopular(Builder $query) : Builder
     {
         return $query->withCount('permissions')->orderBy('permissions_count', 'desc');
-    }
-
-    /**
-     * Scope a query to only include active groups.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeActive(Builder $query) : Builder
-    {
-        return $query->where('is_active', true);
     }
 
     /**

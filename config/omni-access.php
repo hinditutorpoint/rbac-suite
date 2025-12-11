@@ -27,6 +27,7 @@ return [
         'groups' => env('OMNI_ACCESS_GROUPS_TABLE', 'permission_groups'),
         'role_user' => 'role_user',
         'permission_role' => 'permission_role',
+        'permission_user' => 'permission_user',
     ],
 
     /*
@@ -75,6 +76,24 @@ return [
     'guards' => [
         'default' => null, // null = use Laravel's default guard
         'available' => ['web', 'api', 'admin'], // Available guards for roles/permissions
+    ],
+
+    'status' => [
+        // Apply global scope to automatically filter inactive records
+        // If false, you need to manually filter using ->active() scope
+        'apply_global_scope' => true,
+        
+        // Filter inactive permissions in hasPermission() checks
+        // If false, inactive permissions will still work
+        'filter_inactive' => true,
+        
+        // Consider group status when checking permissions
+        // If true, permission in inactive group = no access
+        'check_group_status' => true,
+        
+        // Consider role status when checking roles/permissions
+        // If true, inactive role = no access to its permissions
+        'check_role_status' => true,
     ],
 
     /*

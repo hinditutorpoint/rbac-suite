@@ -1,6 +1,7 @@
 /images/omni-access-free-twitter.png export-ignore
 /index.html export-ignore
 /guide.html export-ignore
+/docs/v1.html export-ignore
 /vendor/ export-ignore
 /composer.lock export-ignore
 /.phpunit.result.cache export-ignore
