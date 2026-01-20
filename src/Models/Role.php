@@ -266,6 +266,28 @@ class Role extends Model
     }
 
     /**
+     * Scope a query to only include users with given role(s).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array $roles
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRole($query, $roles)
+    {
+        if (is_string($roles)) {
+            if (str_contains($roles, '|')) {
+                $roles = explode('|', $roles);
+            } elseif (str_contains($roles, ',')) {
+                 $roles = explode(',', $roles);
+            } else {
+                $roles = [$roles];
+            }
+        }
+        return $query->whereIn('slug', $roles)
+            ->orWhereIn('name', $roles);
+    }
+
+    /**
      * Scope a query to only include popular groups, ordered by the number of permissions they have.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
